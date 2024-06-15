@@ -1,0 +1,9 @@
+{
+  "server": {
+    "http_port": 8080,
+    "host": "localhost",
+    "token_exp_minutes": 60,
+    "refresh_token_exp_minute": 1440,
+    "token_secret": "secret"
+  }
+}
