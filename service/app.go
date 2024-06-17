@@ -1,9 +1,9 @@
 package service
 
 import (
-	"TaamResan/config"
+	"TaamResan/cmd/server/config"
+	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/user"
-	"TaamResan/pkg/adapters/storage"
 	"log"
 
 	"gorm.io/gorm"
@@ -22,7 +22,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	}
 
 	app.mustInitDB()
-	storage.Migrate(app.dbConn)
+	storage2.Migrate(app.dbConn)
 
 	app.setUserService()
 	app.setAuthService()
@@ -42,7 +42,7 @@ func (a *AppContainer) setUserService() {
 	if a.userService != nil {
 		return
 	}
-	a.userService = NewUserService(user.NewOps(storage.NewUserRepo(a.dbConn)))
+	a.userService = NewUserService(user.NewOps(storage2.NewUserRepo(a.dbConn)))
 }
 
 func (a *AppContainer) mustInitDB() {
@@ -50,7 +50,7 @@ func (a *AppContainer) mustInitDB() {
 		return
 	}
 
-	db, err := storage.NewPostgresGormConnection(a.cfg.DB)
+	db, err := storage2.NewPostgresGormConnection(a.cfg.DB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func (a *AppContainer) setAuthService() {
 		return
 	}
 
-	a.authService = NewAuthService(user.NewOps(storage.NewUserRepo(a.dbConn)), []byte(a.cfg.Server.TokenSecret),
+	a.authService = NewAuthService(user.NewOps(storage2.NewUserRepo(a.dbConn)), []byte(a.cfg.Server.TokenSecret),
 		a.cfg.Server.TokenExpMinutes,
 		a.cfg.Server.RefreshTokenExpMinutes)
 }

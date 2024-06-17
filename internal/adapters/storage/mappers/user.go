@@ -1,8 +1,8 @@
 package mappers
 
 import (
+	"TaamResan/internal/adapters/storage/entities"
 	"TaamResan/internal/user"
-	"TaamResan/pkg/adapters/storage/entities"
 )
 
 func UserEntityToDomain(entity *entities.User) *user.User {

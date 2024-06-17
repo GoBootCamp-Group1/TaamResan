@@ -1,9 +1,9 @@
 package storage
 
 import (
+	"TaamResan/internal/adapters/storage/entities"
+	"TaamResan/internal/adapters/storage/mappers"
 	"TaamResan/internal/user"
-	"TaamResan/pkg/adapters/storage/entities"
-	"TaamResan/pkg/adapters/storage/mappers"
 	"context"
 	"errors"
 

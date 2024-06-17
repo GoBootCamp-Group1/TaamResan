@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"TaamResan/config"
-	"TaamResan/pkg/adapters/storage/entities"
+	"TaamResan/cmd/server/config"
+	"TaamResan/internal/adapters/storage/entities"
 	"fmt"
 
 	"gorm.io/driver/postgres"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"TaamResan/config"
+	"TaamResan/cmd/server/config"
 	"TaamResan/service"
 	"flag"
 	"log"
