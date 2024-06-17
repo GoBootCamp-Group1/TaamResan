@@ -4,6 +4,7 @@ import (
 	"TaamResan/internal/user"
 	"TaamResan/pkg/jwt"
 	"context"
+	"errors"
 	"time"
 
 	jwt2 "github.com/golang-jwt/jwt/v5"
@@ -32,6 +33,11 @@ type UserToken struct {
 	ExpiresAt          int64
 }
 
+var (
+	ErrCreatingAuthToken    = errors.New("can not create authentication token")
+	ErrCreatingRefreshToken = errors.New("can not create refresh token")
+)
+
 func (s *AuthService) Login(ctx context.Context, email, pass string) (*UserToken, error) {
 	user, err := s.userOps.GetUserByEmailAndPassword(ctx, email, pass)
 	if err != nil {
@@ -46,12 +52,12 @@ func (s *AuthService) Login(ctx context.Context, email, pass string) (*UserToken
 
 	authToken, err := jwt.CreateToken(s.secret, s.userClaims(user, authExp))
 	if err != nil {
-		return nil, err // todo
+		return nil, ErrCreatingAuthToken
 	}
 
 	refreshToken, err := jwt.CreateToken(s.secret, s.userClaims(user, refreshExp))
 	if err != nil {
-		return nil, err // todo
+		return nil, ErrCreatingRefreshToken
 	}
 
 	return &UserToken{
