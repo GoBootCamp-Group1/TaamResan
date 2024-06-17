@@ -2,7 +2,7 @@ package config
 
 type Config struct {
 	Server Server `json:"server"`
-	//DB     DB     `json:"db"`
+	DB     DB     `json:"db"`
 }
 
 type Server struct {

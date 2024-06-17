@@ -5,5 +5,12 @@
     "token_exp_minutes": 60,
     "refresh_token_exp_minute": 1440,
     "token_secret": "secret"
+  },
+  "db": {
+    "user": "test",
+    "pass": "test",
+    "host": "localhost",
+    "port": 5432,
+    "db_name": "taamresan"
   }
 }

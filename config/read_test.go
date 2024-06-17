@@ -22,7 +22,14 @@ func TestReadStandard(t *testing.T) {
 			"token_exp_minutes": 60,
 			"refresh_token_exp_minute": 1440,
 			"token_secret": "secret"
-		}
+		},
+		"db": {
+			"user": "test",
+			"pass": "test",
+			"host": "localhost",
+			"port": 5432,
+			"db_name": "taamresan"
+  		}
 	}`
 
 	if err := os.WriteFile(cfgFilePath, []byte(cfgContent), os.ModePerm); err != nil {
@@ -36,6 +43,13 @@ func TestReadStandard(t *testing.T) {
 			TokenExpMinutes:        60,
 			RefreshTokenExpMinutes: 1440,
 			TokenSecret:            "secret",
+		},
+		DB: DB{
+			User:   "test",
+			Pass:   "test",
+			Host:   "localhost",
+			Port:   5432,
+			DBName: "taamresan",
 		},
 	}
 
