@@ -32,3 +32,5 @@ go.work.sum
 
 .idea
 
+./cmd/server/config-example.json
+
