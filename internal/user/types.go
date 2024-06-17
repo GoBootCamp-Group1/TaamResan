@@ -27,9 +27,9 @@ func (ur Role) String() string {
 		return "user"
 	case RoleAdmin:
 		return "admin"
-	case RoleRestaurantManager:
+	case RoleRestaurantOwner:
 		return "restaurant manager"
-	case RoleOperator:
+	case RoleRestaurantOperator:
 		return "operator"
 	default:
 		return "unknown"
@@ -39,8 +39,8 @@ func (ur Role) String() string {
 const (
 	RoleUser Role = iota + 1
 	RoleAdmin
-	RoleRestaurantManager
-	RoleOperator
+	RoleRestaurantOwner
+	RoleRestaurantOperator
 )
 
 type User struct {
