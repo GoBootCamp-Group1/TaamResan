@@ -26,6 +26,10 @@ func (ur Role) String() string {
 		return "user"
 	case RoleAdmin:
 		return "admin"
+	case RoleRestaurantManager:
+		return "restaurant manager"
+	case RoleOperator:
+		return "operator"
 	default:
 		return "unknown"
 	}
@@ -34,7 +38,7 @@ func (ur Role) String() string {
 const (
 	RoleUser Role = iota + 1
 	RoleAdmin
-	RoleManager
+	RoleRestaurantManager
 	RoleOperator
 )
 
