@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type Repo interface {
@@ -44,9 +45,10 @@ const (
 
 type User struct {
 	ID        uint
-	FirstName string
-	LastName  string
+	Name      string
 	Email     string
+	Mobile    string
+	BirthDate time.Time
 	Password  string
 	Role      Role
 }

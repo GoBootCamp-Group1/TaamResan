@@ -1,12 +1,16 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type User struct {
 	gorm.Model
-	FirstName string
-	LastName  string
+	Uuid      string
+	Name      string
 	Email     string
+	Mobile    string
+	BirthDate time.Time
 	Password  string
-	Role      uint8
 }

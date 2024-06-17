@@ -8,10 +8,11 @@ import (
 func UserEntityToDomain(entity *entities.User) *user.User {
 	return &user.User{
 		ID:        entity.ID,
-		FirstName: entity.FirstName,
-		LastName:  entity.LastName,
+		Name:      entity.Name,
 		Email:     entity.Email,
+		Mobile:    entity.Mobile,
+		BirthDate: entity.BirthDate,
 		Password:  entity.Password,
-		Role:      user.Role(entity.Role),
+		Role:      user.RoleUser, // TODO: fix this when Role entity is created
 	}
 }
