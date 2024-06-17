@@ -75,6 +75,14 @@ func (s *AuthService) userClaims(user *user.User, exp time.Time) *jwt.UserClaims
 			},
 		},
 		UserID: user.ID,
-		Role:   user.Role.String(),
+		Roles:  getRoleToString(user.Roles),
 	}
+}
+
+func getRoleToString(roles []user.Role) []string {
+	var rolesStr []string
+	for _, role := range roles {
+		rolesStr = append(rolesStr, role.String())
+	}
+	return rolesStr
 }

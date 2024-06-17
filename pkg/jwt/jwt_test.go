@@ -18,7 +18,7 @@ func TestCreateAndParseToken(t *testing.T) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		UserID:   1,
-		Role:     "admin",
+		Roles:    []string{"admin"},
 		Sections: []string{"section1", "section2"},
 	}
 
@@ -31,7 +31,7 @@ func TestCreateAndParseToken(t *testing.T) {
 	assert.NotNil(t, parsedClaims)
 
 	assert.Equal(t, claims.UserID, parsedClaims.UserID)
-	assert.Equal(t, claims.Role, parsedClaims.Role)
+	assert.Equal(t, claims.Roles, parsedClaims.Roles)
 	assert.ElementsMatch(t, claims.Sections, parsedClaims.Sections)
 	assert.Equal(t, claims.RegisteredClaims.Issuer, parsedClaims.RegisteredClaims.Issuer)
 	assert.Equal(t, claims.RegisteredClaims.Subject, parsedClaims.RegisteredClaims.Subject)

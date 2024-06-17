@@ -23,24 +23,24 @@ type Role uint8
 
 func (ur Role) String() string {
 	switch ur {
-	case RoleUser:
-		return "user"
-	case RoleAdmin:
+	case Customer:
+		return "customer"
+	case Admin:
 		return "admin"
-	case RoleRestaurantOwner:
-		return "restaurant manager"
-	case RoleRestaurantOperator:
-		return "operator"
+	case RestaurantOwner:
+		return "restaurant owner"
+	case RestaurantOperator:
+		return "restaurant operator"
 	default:
 		return "unknown"
 	}
 }
 
 const (
-	RoleUser Role = iota + 1
-	RoleAdmin
-	RoleRestaurantOwner
-	RoleRestaurantOperator
+	Customer Role = iota + 1
+	Admin
+	RestaurantOwner
+	RestaurantOperator
 )
 
 type User struct {
@@ -50,7 +50,7 @@ type User struct {
 	Mobile    string
 	BirthDate time.Time
 	Password  string
-	Role      Role
+	Roles     []Role
 }
 
 func (u *User) PasswordIsValid(pass string) bool {

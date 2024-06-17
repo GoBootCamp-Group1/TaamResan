@@ -13,6 +13,6 @@ func UserEntityToDomain(entity *entities.User) *user.User {
 		Mobile:    entity.Mobile,
 		BirthDate: entity.BirthDate,
 		Password:  entity.Password,
-		Role:      user.RoleUser, // TODO: fix this when Role entity is created
+		Roles:     []user.Role{user.Customer}, // TODO: fix this when Role entity is created
 	}
 }
