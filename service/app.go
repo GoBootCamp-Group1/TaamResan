@@ -1,7 +1,7 @@
 package service
 
 import (
-	"TaamResan/cmd/server/config"
+	"TaamResan/cmd/api/config"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/user"
 	"log"
