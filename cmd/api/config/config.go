@@ -5,6 +5,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
+	"sync"
 )
 
 type Config struct {
@@ -47,4 +48,22 @@ func NewConfig() (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+var (
+	config     *Config
+	configOnce sync.Once
+)
+
+// GetConfig Usage example -> cfg, err := GetConfig()
+// GetConfig provides the singleton instance of the configuration.
+func GetConfig() (*Config, error) {
+	var err error
+	configOnce.Do(func() {
+		config, err = NewConfig()
+	})
+	if err != nil {
+		return nil, err
+	}
+	return config, nil
 }

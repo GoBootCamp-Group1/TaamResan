@@ -5,7 +5,6 @@ import (
 	tcp "TaamResan/pkg/tcp_http_server"
 	"TaamResan/pkg/validator"
 	"TaamResan/service"
-	"encoding/json"
 	"net"
 	"time"
 )
@@ -21,7 +20,9 @@ type RequestBody struct {
 func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
 		var reqParams RequestBody
-		err := json.Unmarshal([]byte(request.Body), &reqParams)
+
+		err := request.ExtractParamsInto(&reqParams)
+		//err := json.Unmarshal([]byte(request.Body), &reqParams)
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
 			return
@@ -59,7 +60,6 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 
 		responseData := map[string]any{
 			"message": "you are signed up successfully",
-			"request": request,
 		}
 		tcp.RespondJsonSuccess(conn, responseData)
 		return

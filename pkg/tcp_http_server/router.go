@@ -3,6 +3,7 @@ package tcp_http_server
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"strconv"
@@ -32,6 +33,10 @@ func (r *Request) WithContext(ctx context.Context) *Request {
 	*r2 = *r
 	r2.ctx = ctx
 	return r2
+}
+
+func (r *Request) ExtractParamsInto(mock any) error {
+	return json.Unmarshal([]byte(r.Body), &mock)
 }
 
 // HandlerFunc is the type for HTTP request handlers.
