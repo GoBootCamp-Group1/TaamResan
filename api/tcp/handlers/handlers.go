@@ -13,7 +13,7 @@ func HomeHandler(conn net.Conn, request *tcp.Request) {
 		"message": "Hello, Home!",
 		"request": request,
 	}
-	tcp.RespondJson(conn, responseData, 200)
+	tcp.RespondJson(conn, responseData, tcp.OK)
 }
 
 type RequestBody struct {
@@ -28,7 +28,7 @@ func TodoHandler(conn net.Conn, request *tcp.Request) {
 	// Unmarshal the JSON body into the struct
 	err := json.Unmarshal([]byte(request.Body), &reqParams)
 	if err != nil {
-		tcp.RespondJsonError(conn, err.Error(), 500)
+		tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
 		return
 	}
 
@@ -41,7 +41,7 @@ func TodoHandler(conn net.Conn, request *tcp.Request) {
 
 	// Respond with validation errors if any
 	if len(errors) > 0 {
-		tcp.RespondJsonValidateError(conn, errors, 422)
+		tcp.RespondJsonValidateError(conn, errors, tcp.INVALID_INPUT)
 		return
 	}
 

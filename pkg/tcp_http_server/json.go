@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"net/http"
 )
 
 // RespondJson writes a JSON response to the client.
 func RespondJson(conn net.Conn, data any, statusCode int) {
 	responseBody, err := json.Marshal(data)
 	if err != nil {
-		RespondJsonError(conn, "Internal Server Error", 500)
+		RespondJsonError(conn, "Internal Server Error", INTERNAL_SERVER_ERROR)
 		return
 	}
 
@@ -49,7 +48,7 @@ func RespondJsonValidateError(conn net.Conn, errors []string, statusCode int) {
 // RespondJsonSuccess writes an error response to the client.
 func RespondJsonSuccess(conn net.Conn, data any) {
 	responseBody := map[string]any{"data": data}
-	RespondJson(conn, responseBody, http.StatusOK)
+	RespondJson(conn, responseBody, OK)
 }
 
 // RespondJsonPaginate writes an error response to the client.
