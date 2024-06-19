@@ -38,7 +38,7 @@ var (
 	ErrCreatingRefreshToken = errors.New("can not create refresh token")
 )
 
-func (s *AuthService) Login(ctx context.Context, email, pass string) (*UserToken, error) {
+func (s *AuthService) LoginWithEmail(ctx context.Context, email, pass string) (*UserToken, error) {
 	user, err := s.userOps.GetUserByEmailAndPassword(ctx, email, pass)
 	if err != nil {
 		return nil, err

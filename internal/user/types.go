@@ -11,6 +11,7 @@ import (
 type Repo interface {
 	Create(ctx context.Context, user *User) error
 	GetByID(ctx context.Context, id uint) (*User, error)
+	GetByMobile(ctx context.Context, mobile string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 }
 
@@ -51,6 +52,18 @@ type User struct {
 	BirthDate time.Time
 	Password  string
 	Roles     []Role
+}
+
+func (u *User) ValidateMobile(mobile string) error {
+	panic("implement me")
+}
+
+func (u *User) ValidateEmail(email string) error {
+	panic("implement me")
+}
+
+func (u *User) ValidatePassword(pass string) error {
+	panic("implement me")
 }
 
 func (u *User) PasswordIsValid(pass string) bool {

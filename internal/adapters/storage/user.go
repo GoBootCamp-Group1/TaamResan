@@ -28,6 +28,18 @@ func (r *userRepo) GetByID(ctx context.Context, id uint) (*user.User, error) {
 	panic("not implemented")
 }
 
+func (r *userRepo) GetByMobile(ctx context.Context, mobile string) (*user.User, error) {
+	var user entities.User
+	err := r.db.WithContext(ctx).Model(&entities.User{}).Where("mobile = ?", mobile).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return mappers.UserEntityToDomain(&user), nil
+}
+
 func (r *userRepo) GetByEmail(ctx context.Context, email string) (*user.User, error) {
 	var user entities.User
 	err := r.db.WithContext(ctx).Model(&entities.User{}).Where("email = ?", email).First(&user).Error
