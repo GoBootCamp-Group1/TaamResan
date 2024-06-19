@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"regexp"
+	"unicode"
 )
 
 // Validator struct to hold value and errors.
@@ -55,6 +56,32 @@ func (v *Validator) Phone() *Validator {
 	if !re.MatchString(v.value) {
 		v.errors = append(v.errors, fmt.Sprintf("%s is invalid phone number", v.value))
 	}
+	return v
+}
+
+func (v *Validator) Password() *Validator {
+	if len(v.value) < 8 {
+		v.errors = append(v.errors, "password must be at least 8 characters long")
+	}
+
+	hasUpper := false
+	hasSpecial := false
+	for _, char := range v.value {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+
+	if !hasUpper {
+		v.errors = append(v.errors, "password must have at least one uppercase letter")
+	}
+	if !hasSpecial {
+		v.errors = append(v.errors, "password must have at least one special character")
+	}
+
 	return v
 }
 
