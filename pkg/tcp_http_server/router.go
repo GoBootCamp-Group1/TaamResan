@@ -2,6 +2,7 @@ package tcp_http_server
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"net"
 	"strconv"
@@ -13,6 +14,14 @@ type Request struct {
 	Uri     string
 	Body    string
 	Headers map[string]string
+	ctx     context.Context
+}
+
+func (r *Request) Context() context.Context {
+	if r.ctx != nil {
+		return r.ctx
+	}
+	return context.Background()
 }
 
 // HandlerFunc is the type for HTTP request handlers.
@@ -129,6 +138,7 @@ func (r *Router) Serve(conn net.Conn) {
 			Uri:     uri,
 			Body:    body,
 			Headers: headers,
+			ctx:     context.Background(),
 		}
 
 		route.handler(conn, &request)
@@ -139,5 +149,5 @@ func (r *Router) Serve(conn net.Conn) {
 
 // HttpNotFound writes a 404 Not Found response.
 func HttpNotFound(conn net.Conn) {
-	RespondJsonError(conn, "Not Found", 404)
+	RespondJsonError(conn, "Not Found", NOT_FOUND)
 }
