@@ -44,7 +44,7 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		user := user.User{
+		newUser := user.User{
 			Name:      reqParams.Name,
 			Email:     reqParams.Email,
 			Mobile:    reqParams.Phone,
@@ -52,7 +52,7 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 			BirthDate: reqParams.BirthDate,
 		}
 
-		err = app.UserService().CreateUser(request.Context(), &user)
+		err = app.UserService().CreateUser(request.Context(), &newUser)
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
 			return
