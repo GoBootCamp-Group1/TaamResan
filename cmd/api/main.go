@@ -4,12 +4,9 @@ import (
 	httpserver "TaamResan/api/tcp"
 	"TaamResan/cmd/api/config"
 	"TaamResan/service"
-	"flag"
 	"log"
 	"log/slog"
 )
-
-var configPath = flag.String("config", "", "configuration path")
 
 func main() {
 	cfg, errConfig := config.NewConfig()

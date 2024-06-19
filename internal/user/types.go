@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"time"
@@ -11,6 +12,7 @@ import (
 type Repo interface {
 	Create(ctx context.Context, user *User) error
 	GetByID(ctx context.Context, id uint) (*User, error)
+	GetByMobile(ctx context.Context, mobile string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 }
 
@@ -51,6 +53,12 @@ type User struct {
 	BirthDate time.Time
 	Password  string
 	Roles     []Role
+}
+
+func HashPassword(password string) string {
+	h := sha256.New()
+	h.Write([]byte(password))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func (u *User) PasswordIsValid(pass string) bool {

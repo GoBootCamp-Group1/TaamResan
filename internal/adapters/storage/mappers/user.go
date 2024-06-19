@@ -16,3 +16,13 @@ func UserEntityToDomain(entity *entities.User) *user.User {
 		Roles:     []user.Role{user.Customer}, // TODO: fix this when Role entity is created
 	}
 }
+
+func DomainToUserEntity(model *user.User) *entities.User {
+	return &entities.User{
+		Name:      model.Name,
+		Email:     model.Email,
+		Mobile:    model.Mobile,
+		BirthDate: model.BirthDate,
+		Password:  user.HashPassword(model.Password),
+	}
+}
