@@ -6,7 +6,6 @@ import (
 	"TaamResan/internal/user"
 	"context"
 	"errors"
-
 	"gorm.io/gorm"
 )
 
@@ -21,7 +20,8 @@ func NewUserRepo(db *gorm.DB) user.Repo {
 }
 
 func (r *userRepo) Create(ctx context.Context, user *user.User) error {
-	panic("not implemented")
+	entity := mappers.DomainToUserEntity(user)
+	return r.db.WithContext(ctx).Create(&entity).Error
 }
 
 func (r *userRepo) GetByID(ctx context.Context, id uint) (*user.User, error) {
@@ -33,7 +33,7 @@ func (r *userRepo) GetByMobile(ctx context.Context, mobile string) (*user.User, 
 	err := r.db.WithContext(ctx).Model(&entities.User{}).Where("mobile = ?", mobile).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return nil, err
 		}
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*user.User, er
 	err := r.db.WithContext(ctx).Model(&entities.User{}).Where("email = ?", email).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return nil, err
 		}
 		return nil, err
 	}

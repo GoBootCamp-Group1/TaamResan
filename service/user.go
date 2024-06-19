@@ -35,7 +35,7 @@ func (s *UserService) CreateUser(ctx context.Context, user *user.User) error {
 	}
 
 	err = s.userOps.Create(ctx, user)
-	if err == nil {
+	if err != nil {
 		return ErrCreatingUser
 	}
 

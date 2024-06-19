@@ -2,6 +2,8 @@ package tcp
 
 import (
 	"TaamResan/api/tcp/handlers"
+	"TaamResan/api/tcp/handlers/authentication_handlers"
+	"TaamResan/api/tcp/handlers/signup_handlers"
 	"TaamResan/api/tcp/middlewares"
 	"TaamResan/cmd/api/config"
 	"TaamResan/pkg/tcp_http_server"
@@ -51,4 +53,15 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 		middlewares.LoggingMiddleware,
 		//middlewares.AuthMiddleware,
 	))
+
+	router.HandleFunc("POST /signup", tcp_http_server.HandlerChain(
+		signup_handlers.SignUp(app),
+		middlewares.LoggingMiddleware,
+	))
+
+	router.HandleFunc("POST /login", tcp_http_server.HandlerChain(
+		authentication_handlers.Login(app),
+		middlewares.LoggingMiddleware,
+	))
+
 }
