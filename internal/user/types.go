@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"time"
@@ -54,16 +55,10 @@ type User struct {
 	Roles     []Role
 }
 
-func (u *User) ValidateMobile(mobile string) error {
-	panic("implement me")
-}
-
-func (u *User) ValidateEmail(email string) error {
-	panic("implement me")
-}
-
-func (u *User) ValidatePassword(pass string) error {
-	panic("implement me")
+func HashPassword(password string) string {
+	h := sha256.New()
+	h.Write([]byte(password))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func (u *User) PasswordIsValid(pass string) bool {
