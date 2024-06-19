@@ -25,7 +25,7 @@ func Run(cfg config.Server, app *service.AppContainer) {
 	router := tcp_http_server.NewRouter()
 
 	// register global routes
-	registerGlobalRoutes(router, app)
+	registerGlobalRoutes(router, app, cfg)
 
 	// registering users APIs
 	//registerUsersAPI(api, app.UserService(), []byte(cfg.TokenSecret))
@@ -43,7 +43,7 @@ func Run(cfg config.Server, app *service.AppContainer) {
 	}
 }
 
-func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContainer) {
+func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContainer, cfg config.Server) {
 	router.HandleFunc("GET /", tcp_http_server.HandlerChain(
 		handlers.HomeHandler,
 		middlewares.LoggingMiddleware,
@@ -51,7 +51,7 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 	router.HandleFunc("POST /todo", tcp_http_server.HandlerChain(
 		handlers.TodoHandler,
 		middlewares.LoggingMiddleware,
-		//middlewares.AuthMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("POST /signup", tcp_http_server.HandlerChain(
