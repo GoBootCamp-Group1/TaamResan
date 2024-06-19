@@ -36,23 +36,23 @@ func RespondJsonError(conn net.Conn, message string, statusCode int) {
 }
 
 // RespondJsonValidateError writes validation errors response to the client.
-func RespondJsonValidateError(conn net.Conn, messages []string, statusCode int) {
+func RespondJsonValidateError(conn net.Conn, errors []string, statusCode int) {
 
 	if statusCode == 0 {
 		statusCode = 422
 	}
 
-	responseBody := map[string][]string{"error": messages}
+	responseBody := map[string][]string{"errors": errors}
 	RespondJson(conn, responseBody, statusCode)
 }
 
 // RespondJsonSuccess writes an error response to the client.
-func RespondJsonSuccess(conn net.Conn, data any, statusCode int) {
-
-	if statusCode == 0 {
-		statusCode = http.StatusOK
-	}
-
+func RespondJsonSuccess(conn net.Conn, data any) {
 	responseBody := map[string]any{"data": data}
-	RespondJson(conn, responseBody, statusCode)
+	RespondJson(conn, responseBody, http.StatusOK)
+}
+
+// RespondJsonPaginate writes an error response to the client.
+func RespondJsonPaginate(conn net.Conn, data any) {
+	//TODO: implement
 }
