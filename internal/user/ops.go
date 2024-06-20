@@ -36,6 +36,10 @@ func (o *Ops) Create(ctx context.Context, user *User) error {
 	return o.repo.Create(ctx, user)
 }
 
+func (o *Ops) Update(ctx context.Context, user *User) error {
+	return o.repo.Update(ctx, user)
+}
+
 func (o *Ops) GetUserByID(ctx context.Context, id uint) (*User, error) {
 	return o.repo.GetByID(ctx, id)
 }

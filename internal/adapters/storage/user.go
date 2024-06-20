@@ -24,6 +24,11 @@ func (r *userRepo) Create(ctx context.Context, user *user.User) error {
 	return r.db.WithContext(ctx).Create(&entity).Error
 }
 
+func (r *userRepo) Update(ctx context.Context, user *user.User) error {
+	entity := mappers.DomainToUserEntity(user)
+	return r.db.WithContext(ctx).Save(&entity).Error
+}
+
 func (r *userRepo) GetByID(ctx context.Context, id uint) (*user.User, error) {
 	panic("not implemented")
 }

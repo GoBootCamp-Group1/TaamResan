@@ -59,6 +59,14 @@ func (v *Validator) Phone() *Validator {
 	return v
 }
 
+func (v *Validator) Date() *Validator {
+	re := regexp.MustCompile(`^d{4}-d{2}-d{2}$`)
+	if !re.MatchString(v.value) {
+		v.errors = append(v.errors, fmt.Sprintf("%s is invalid date YYYY-mm-dd", v.value))
+	}
+	return v
+}
+
 func (v *Validator) Password() *Validator {
 	if len(v.value) < 8 {
 		v.errors = append(v.errors, "password must be at least 8 characters long")

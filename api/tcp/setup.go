@@ -5,6 +5,7 @@ import (
 	"TaamResan/api/tcp/handlers/authentication_handlers"
 	"TaamResan/api/tcp/handlers/signup_handlers"
 	"TaamResan/api/tcp/middlewares"
+	"TaamResan/api/tcp/routes"
 	"TaamResan/cmd/api/config"
 	"TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
@@ -63,5 +64,7 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 		authentication_handlers.Login(app),
 		middlewares.LoggingMiddleware,
 	))
+
+	routes.InitUserRoutes(router, app, cfg)
 
 }

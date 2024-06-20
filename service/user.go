@@ -41,3 +41,24 @@ func (s *UserService) CreateUser(ctx context.Context, user *user.User) error {
 
 	return nil
 }
+
+func (s *UserService) UpdateUserProfile(ctx context.Context, u *user.User) error {
+	foundUserByMobile, err := s.userOps.FindUserByMobile(ctx, u.Mobile)
+	if err == nil && foundUserByMobile.ID != u.ID {
+		return ErrUserExists
+	}
+
+	if u.Email != "" {
+		foundUserByEmail, err := s.userOps.FindUserByEmail(ctx, u.Email)
+		if err == nil && foundUserByEmail.ID != u.ID {
+			return ErrUserExists
+		}
+	}
+
+	err = s.userOps.Update(ctx, u)
+	if err != nil {
+		return ErrCreatingUser
+	}
+
+	return nil
+}
