@@ -11,6 +11,7 @@ import (
 
 type Repo interface {
 	Create(ctx context.Context, user *User) error
+	Update(ctx context.Context, user *User) error
 	GetByID(ctx context.Context, id uint) (*User, error)
 	GetByMobile(ctx context.Context, mobile string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
@@ -47,6 +48,7 @@ const (
 
 type User struct {
 	ID        uint
+	Uuid      string
 	Name      string
 	Email     string
 	Mobile    string

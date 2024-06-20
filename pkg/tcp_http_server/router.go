@@ -1,6 +1,7 @@
 package tcp_http_server
 
 import (
+	"TaamResan/pkg/jwt"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -37,6 +38,14 @@ func (r *Request) WithContext(ctx context.Context) *Request {
 
 func (r *Request) ExtractParamsInto(mock any) error {
 	return json.Unmarshal([]byte(r.Body), &mock)
+}
+
+func (r *Request) GetClaims() *jwt.UserClaims {
+	return r.Context().Value(jwt.UserClaimKey).(*jwt.UserClaims)
+}
+
+func (r *Request) GetUserID() uint {
+	return r.Context().Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 }
 
 // HandlerFunc is the type for HTTP request handlers.

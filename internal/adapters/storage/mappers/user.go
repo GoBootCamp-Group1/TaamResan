@@ -19,6 +19,8 @@ func UserEntityToDomain(entity *entities.User) *user.User {
 
 func DomainToUserEntity(model *user.User) *entities.User {
 	return &entities.User{
+		ID:        model.ID,
+		Uuid:      model.Uuid,
 		Name:      model.Name,
 		Email:     model.Email,
 		Mobile:    model.Mobile,

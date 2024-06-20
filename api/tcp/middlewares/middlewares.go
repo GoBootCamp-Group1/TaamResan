@@ -46,6 +46,9 @@ func AuthMiddleware(secret string) tcp.MiddlewareFunc {
 				tcp.RespondJsonError(conn, "Unauthorized", tcp.UNAUTHORIZED)
 				return
 			}
+
+			//TODO: check for existing user_id in database
+
 			ctx := context.WithValue(request.Context(), jwt.UserClaimKey, claims)
 			request = request.WithContext(ctx)
 

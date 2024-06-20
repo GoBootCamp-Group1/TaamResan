@@ -5,6 +5,7 @@ import (
 	tcp "TaamResan/pkg/tcp_http_server"
 	"TaamResan/pkg/validator"
 	"TaamResan/service"
+	"github.com/google/uuid"
 	"net"
 	"time"
 )
@@ -45,6 +46,7 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 		}
 
 		newUser := user.User{
+			Uuid:      uuid.NewString(),
 			Name:      reqParams.Name,
 			Email:     reqParams.Email,
 			Mobile:    reqParams.Phone,
