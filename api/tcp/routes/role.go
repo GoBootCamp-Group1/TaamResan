@@ -21,14 +21,20 @@ func InitRoleRoutes(router *tcp_http_server.Router, app *service.AppContainer, c
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("DELETE /role", tcp_http_server.HandlerChain(
+	router.HandleFunc("DELETE /role/:id", tcp_http_server.HandlerChain(
 		role_handlers.DeleteRole(app),
 		middlewares.LoggingMiddleware,
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("GET /role", tcp_http_server.HandlerChain(
+	router.HandleFunc("GET /role/:id", tcp_http_server.HandlerChain(
 		role_handlers.GetRole(app),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
+
+	router.HandleFunc("GET /roles", tcp_http_server.HandlerChain(
+		role_handlers.GetAllRoles(app),
 		middlewares.LoggingMiddleware,
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))

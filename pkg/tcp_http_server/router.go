@@ -7,20 +7,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"regexp"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 type Request struct {
-	Method    string
-	Uri       string
-	Body      string
-	Headers   map[string]string
-	UrlParams map[string]string
+	Method      string
+	Uri         string
+	Body        string
+	Headers     map[string]string
+	UrlParams   map[string]string
 	QueryParams map[string]string
-	ctx       context.Context
+	ctx         context.Context
 }
 
 func (r *Request) Context() context.Context {
@@ -205,6 +205,7 @@ func (r *Router) Serve(conn net.Conn) {
 			route.handler(conn, request)
 			return
 		}
+	}
 
 	HttpNotFound(conn)
 }

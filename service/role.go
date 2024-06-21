@@ -3,7 +3,6 @@ package service
 import (
 	"TaamResan/internal/role"
 	"context"
-	"errors"
 )
 
 type RoleService struct {
@@ -13,12 +12,6 @@ type RoleService struct {
 func NewRoleService(roleOps *role.Ops) *RoleService {
 	return &RoleService{roleOps: roleOps}
 }
-
-var (
-	ErrCreatingRole = errors.New("can not create role")
-	ErrDeletingRole = errors.New("can not delete role")
-	ErrReadingRole  = errors.New("can not read role")
-)
 
 func (s *RoleService) InitializeRoles(ctx context.Context) error {
 	roles := []role.Role{
@@ -47,10 +40,18 @@ func (s *RoleService) Delete(ctx context.Context, id uint) error {
 	return s.roleOps.Delete(ctx, id)
 }
 
-func (s *RoleService) GetByName(ctx context.Context, name string) (role.Role, error) {
-	model, err := s.roleOps.GetByName(ctx, name)
+func (s *RoleService) Get(ctx context.Context, id uint) (role.Role, error) {
+	model, err := s.roleOps.Get(ctx, id)
 	if err != nil {
-		return role.Role{}, ErrReadingRole
+		return role.Role{}, err
 	}
 	return *model, nil
+}
+
+func (s *RoleService) GetAll(ctx context.Context) ([]*role.Role, error) {
+	models, err := s.roleOps.GetAll(ctx)
+	if err != nil {
+		return []*role.Role{}, err
+	}
+	return models, nil
 }

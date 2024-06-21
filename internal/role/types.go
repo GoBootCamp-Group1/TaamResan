@@ -6,7 +6,8 @@ type Repo interface {
 	Create(ctx context.Context, role *Role) error
 	Update(ctx context.Context, role *Role) error
 	Delete(ctx context.Context, id uint) error
-	GetByName(ctx context.Context, name string) (*Role, error)
+	Get(ctx context.Context, id uint) (*Role, error)
+	GetAll(ctx context.Context) ([]*Role, error)
 }
 
 type Role struct {

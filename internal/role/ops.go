@@ -26,6 +26,10 @@ func (o *Ops) Delete(ctx context.Context, id uint) error {
 	return o.repo.Delete(ctx, id)
 }
 
-func (o *Ops) GetByName(ctx context.Context, name string) (*Role, error) {
-	return o.repo.GetByName(ctx, name)
+func (o *Ops) Get(ctx context.Context, id uint) (*Role, error) {
+	return o.repo.Get(ctx, id)
+}
+
+func (o *Ops) GetAll(ctx context.Context) ([]*Role, error) {
+	return o.repo.GetAll(ctx)
 }

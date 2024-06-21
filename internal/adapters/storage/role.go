@@ -20,12 +20,13 @@ func NewRoleRepo(db *gorm.DB) role.Repo {
 }
 
 var (
-	ErrCreatingRole      = errors.New("error creating role")
-	ErrUpdatingRole      = errors.New("error updating role")
-	ErrDeletingRole      = errors.New("error deleting role")
-	ErrRoleNotFound      = errors.New("role doesn't exist")
-	ErrRoleExists        = errors.New("role already exists")
-	ErrNonUniqueRoleName = errors.New("role with this name exists")
+	ErrCreatingRole        = errors.New("error creating role")
+	ErrUpdatingRole        = errors.New("error updating role")
+	ErrDeletingRole        = errors.New("error deleting role")
+	ErrRoleNotFound        = errors.New("role doesn't exist")
+	ErrRoleExists          = errors.New("role already exists")
+	ErrNonUniqueRoleName   = errors.New("role with this name exists")
+	ErrNotEnoughParameters = errors.New("not enough parameters")
 )
 
 func (r roleRepo) Create(ctx context.Context, role *role.Role) error {
@@ -82,12 +83,21 @@ func (r roleRepo) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (r roleRepo) GetByName(ctx context.Context, name string) (*role.Role, error) {
+func (r roleRepo) Get(ctx context.Context, id uint) (*role.Role, error) {
 	var existingRole entities.Role
-	err := r.db.WithContext(ctx).Model(&entities.Role{}).Where("name = ?", name).First(&existingRole).Error
+	err := r.db.WithContext(ctx).Model(&entities.Role{}).Where("id = ?", id).First(&existingRole).Error
 	if err != nil {
 		return nil, ErrRoleNotFound
 	}
 	model := mappers.RoleEntityToDomain(&existingRole)
 	return model, nil
+}
+
+func (r roleRepo) GetAll(ctx context.Context) ([]*role.Role, error) {
+	var roles []*role.Role
+	err := r.db.WithContext(ctx).Model(&role.Role{}).Find(&roles).Error
+	if err != nil {
+		return nil, ErrRoleNotFound
+	}
+	return roles, nil
 }
