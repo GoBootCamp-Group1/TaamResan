@@ -7,7 +7,6 @@ import (
 	"TaamResan/internal/user"
 	"context"
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -49,7 +48,6 @@ func (r *userRepo) Create(ctx context.Context, user *user.User) error {
 		}
 
 		//Create Wallet
-		fmt.Println(entity.ID)
 		walletEntity := entities.Wallet{
 			UserID: entity.ID,
 			Credit: 0.0,
