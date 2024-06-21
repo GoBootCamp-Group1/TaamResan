@@ -1,6 +1,7 @@
 package service
 
 import (
+	"TaamResan/internal/role"
 	"TaamResan/internal/user"
 	"TaamResan/pkg/jwt"
 	"context"
@@ -109,10 +110,10 @@ func (s *AuthService) userClaims(user *user.User, exp time.Time) *jwt.UserClaims
 	}
 }
 
-func getRoleToString(roles []user.Role) []string {
+func getRoleToString(roles []role.Role) []string {
 	var rolesStr []string
-	for _, role := range roles {
-		rolesStr = append(rolesStr, role.String())
+	for _, r := range roles {
+		rolesStr = append(rolesStr, r.String())
 	}
 	return rolesStr
 }

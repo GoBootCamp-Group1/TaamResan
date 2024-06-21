@@ -1,6 +1,7 @@
 package user
 
 import (
+	"TaamResan/internal/role"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -22,30 +23,6 @@ var (
 	ErrInvalidPassword = errors.New("invalid user password")
 )
 
-type Role uint8
-
-func (ur Role) String() string {
-	switch ur {
-	case Customer:
-		return "customer"
-	case Admin:
-		return "admin"
-	case RestaurantOwner:
-		return "restaurant owner"
-	case RestaurantOperator:
-		return "restaurant operator"
-	default:
-		return "unknown"
-	}
-}
-
-const (
-	Customer Role = iota + 1
-	Admin
-	RestaurantOwner
-	RestaurantOperator
-)
-
 type User struct {
 	ID        uint
 	Uuid      string
@@ -54,7 +31,7 @@ type User struct {
 	Mobile    string
 	BirthDate time.Time
 	Password  string
-	Roles     []Role
+	Roles     []role.Role
 }
 
 func HashPassword(password string) string {

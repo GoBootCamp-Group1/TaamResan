@@ -7,16 +7,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/url"
 	"strconv"
 	"strings"
 )
 
 type Request struct {
-	Method  string
-	Uri     string
-	Body    string
-	Headers map[string]string
-	ctx     context.Context
+	Method      string
+	Uri         string
+	Body        string
+	Headers     map[string]string
+	QueryParams map[string]string
+	ctx         context.Context
 }
 
 func (r *Request) Context() context.Context {
@@ -46,6 +48,19 @@ func (r *Request) GetClaims() *jwt.UserClaims {
 
 func (r *Request) GetUserID() uint {
 	return r.Context().Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+}
+
+func (r *Request) fillQueryParams() {
+	r.QueryParams = make(map[string]string)
+	parsedUrl, err := url.Parse(r.Uri)
+	if err != nil {
+		return
+	}
+	for key, values := range parsedUrl.Query() {
+		if len(values) > 0 {
+			r.QueryParams[key] = values[0]
+		}
+	}
 }
 
 // HandlerFunc is the type for HTTP request handlers.
@@ -164,6 +179,7 @@ func (r *Router) Serve(conn net.Conn) {
 			Headers: headers,
 			ctx:     context.Background(),
 		}
+		request.fillQueryParams()
 
 		route.handler(conn, &request)
 	} else {

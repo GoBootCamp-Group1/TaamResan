@@ -2,6 +2,7 @@ package mappers
 
 import (
 	"TaamResan/internal/adapters/storage/entities"
+	"TaamResan/internal/role"
 	"TaamResan/internal/user"
 )
 
@@ -13,7 +14,9 @@ func UserEntityToDomain(entity *entities.User) *user.User {
 		Mobile:    entity.Mobile,
 		BirthDate: entity.BirthDate,
 		Password:  entity.Password,
-		Roles:     []user.Role{user.Customer}, // TODO: fix this when Role entity is created
+		Roles: []role.Role{
+			{ID: role.Customer, Name: role.CUSTOMER},
+		}, // TODO
 	}
 }
 
