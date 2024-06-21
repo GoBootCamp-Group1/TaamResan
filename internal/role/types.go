@@ -33,3 +33,5 @@ const (
 	RestaurantOwner
 	RestaurantOperator
 )
+
+var DefaultRole = Role{ID: Customer, Name: CUSTOMER}

@@ -3,6 +3,7 @@ package storage
 import (
 	"TaamResan/internal/adapters/storage/entities"
 	"TaamResan/internal/adapters/storage/mappers"
+	"TaamResan/internal/role"
 	"TaamResan/internal/user"
 	"context"
 	"errors"
@@ -20,8 +21,34 @@ func NewUserRepo(db *gorm.DB) user.Repo {
 }
 
 func (r *userRepo) Create(ctx context.Context, user *user.User) error {
-	entity := mappers.DomainToUserEntity(user)
-	return r.db.WithContext(ctx).Create(&entity).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		entity := mappers.DomainToUserEntity(user)
+		err := tx.WithContext(ctx).Create(&entity).Error
+		if err != nil {
+			return err
+		}
+
+		var userRoles []entities.UserRoles
+		if len(user.Roles) > 0 {
+			for _, role := range user.Roles {
+				ur := entities.UserRoles{
+					UserId: user.ID,
+					RoleId: role.ID,
+				}
+				userRoles = append(userRoles, ur)
+			}
+		} else {
+			userRoles = append(userRoles, entities.UserRoles{
+				UserId: entity.ID,
+				RoleId: role.DefaultRole.ID,
+			})
+		}
+		if err = tx.Create(&userRoles).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (r *userRepo) Update(ctx context.Context, user *user.User) error {

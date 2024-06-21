@@ -7,7 +7,6 @@ import (
 type UserRoles struct {
 	gorm.Model
 	ID     uint
-	Uuid   string
 	UserId uint
 	RoleId uint
 }
