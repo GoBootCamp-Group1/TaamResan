@@ -24,10 +24,10 @@ func DeleteRole(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "role deleted successfully",
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

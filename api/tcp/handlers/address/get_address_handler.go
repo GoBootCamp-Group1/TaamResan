@@ -34,10 +34,10 @@ func GetAddress(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
-			"address": getAddressResponse(conn, fetchedAddress),
+		responseBody := map[string]any{
+			"data": map[string]any{"address": getAddressResponse(conn, fetchedAddress)},
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

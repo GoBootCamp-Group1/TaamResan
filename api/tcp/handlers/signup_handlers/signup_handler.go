@@ -62,10 +62,10 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "you are signed up successfully",
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

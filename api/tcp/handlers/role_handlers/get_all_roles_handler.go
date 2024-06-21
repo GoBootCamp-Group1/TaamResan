@@ -16,11 +16,11 @@ func GetAllRoles(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "roles loaded successfully",
-			"role":    &roleModels,
+			"data":    map[string]any{"roles": &roleModels},
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

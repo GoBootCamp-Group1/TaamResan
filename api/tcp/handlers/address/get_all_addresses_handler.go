@@ -24,10 +24,10 @@ func GetAllAddresses(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
-			"addresses": getAddressesResponse(conn, addresses),
+		responseBody := map[string]any{
+			"data": map[string]any{"addresses": getAddressesResponse(conn, addresses)},
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

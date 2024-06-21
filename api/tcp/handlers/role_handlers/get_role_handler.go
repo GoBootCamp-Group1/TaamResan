@@ -24,11 +24,11 @@ func GetRole(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "role loaded successfully",
-			"role":    roleModel,
+			"data":    map[string]any{"role": roleModel},
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }
