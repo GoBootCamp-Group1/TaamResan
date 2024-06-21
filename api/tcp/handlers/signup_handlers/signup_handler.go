@@ -30,14 +30,17 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 
 		nameValidator := validator.Validate(reqParams.Name).MinLength(3)
 		phoneValidator := validator.Validate(reqParams.Phone).Phone()
-		emailValidator := validator.Validate(reqParams.Email).Email()
 		passwordValidator := validator.Validate(reqParams.Password).Password()
 
 		var errors []string
 		errors = append(errors, nameValidator.Errors()...)
 		errors = append(errors, phoneValidator.Errors()...)
-		errors = append(errors, emailValidator.Errors()...)
 		errors = append(errors, passwordValidator.Errors()...)
+
+		if reqParams.Email != "" {
+			emailValidator := validator.Validate(reqParams.Email).Email()
+			errors = append(errors, emailValidator.Errors()...)
+		}
 
 		if len(errors) > 0 {
 			tcp.RespondJsonValidateError(conn, errors, tcp.INVALID_INPUT)
