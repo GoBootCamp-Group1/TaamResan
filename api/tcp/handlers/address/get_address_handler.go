@@ -7,6 +7,13 @@ import (
 	"strconv"
 )
 
+//type GetAddressResponse struct {
+//	ID    int     `json:"id"`
+//	Title string  `json:"title"`
+//	Lat   float64 `json:"lat"`
+//	Lng   float64 `json:"lng"`
+//}
+
 func GetAddress(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
 		//get address id from url params
@@ -25,8 +32,14 @@ func GetAddress(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
+		//var result GetAddressResponse
+		//marshalled, _ := json.Marshal(address)
+		//if err := json.Unmarshal(marshalled, &result); err != nil {
+		//	fmt.Printf("Can not unmarshal JSON, %v", err.Error())
+		//}
+
 		responseData := map[string]any{
-			"data": address,
+			"address": address,
 		}
 		tcp.RespondJsonSuccess(conn, responseData)
 		return

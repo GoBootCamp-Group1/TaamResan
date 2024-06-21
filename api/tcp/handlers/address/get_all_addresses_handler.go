@@ -16,7 +16,7 @@ func GetAllAddresses(app *service.AppContainer) tcp.HandlerFunc {
 		}
 
 		responseData := map[string]any{
-			"data": addresses,
+			"address": addresses,
 		}
 		tcp.RespondJsonSuccess(conn, responseData)
 		return
