@@ -29,10 +29,6 @@ func (r *userRepo) Update(ctx context.Context, user *user.User) error {
 	return r.db.WithContext(ctx).Save(&entity).Error
 }
 
-func (r *userRepo) GetByID(ctx context.Context, id uint) (*user.User, error) {
-	panic("not implemented")
-}
-
 func (r *userRepo) GetByMobile(ctx context.Context, mobile string) (*user.User, error) {
 	var user entities.User
 	err := r.db.WithContext(ctx).Model(&entities.User{}).Where("mobile = ?", mobile).First(&user).Error
