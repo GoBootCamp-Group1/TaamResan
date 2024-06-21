@@ -64,7 +64,7 @@ func (r roleRepo) Update(ctx context.Context, role *role.Role) error {
 		}
 
 		existingRole.Name = role.Name
-		if err := r.db.WithContext(ctx).Model(&entities.Role{}).Where("id = ?", role.ID).Updates(&existingRole).Error; err != nil {
+		if err := r.db.WithContext(ctx).Model(&entities.Role{}).Where("id = ?", role.ID).Save(&existingRole).Error; err != nil {
 			return ErrUpdatingRole
 		}
 	}
