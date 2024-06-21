@@ -50,10 +50,10 @@ func TodoHandler(conn net.Conn, request *tcp.Request) {
 	//	return
 	//}
 
-	responseData := map[string]any{
+	responseBody := map[string]any{
 		"message": "Hello, TODO!",
 		"request": request,
 	}
-	tcp.RespondJsonSuccess(conn, responseData)
+	tcp.RespondJsonSuccess(conn, responseBody)
 	return
 }

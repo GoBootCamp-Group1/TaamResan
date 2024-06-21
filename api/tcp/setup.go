@@ -7,13 +7,23 @@ import (
 	"TaamResan/api/tcp/middlewares"
 	"TaamResan/api/tcp/routes"
 	"TaamResan/cmd/api/config"
+	"TaamResan/internal/adapters/storage"
 	"TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
+	"context"
+	"errors"
 	"fmt"
+	"log"
 	"net"
 )
 
 func Run(cfg config.Server, app *service.AppContainer) {
+	if err := app.RoleService().InitializeRoles(context.Background()); err != nil {
+		if !errors.Is(err, storage.ErrRoleExists) {
+			log.Fatalf("Error initializing roles: %v", err)
+		}
+	}
+
 	// Define listener
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
@@ -67,5 +77,6 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 
 	routes.InitUserRoutes(router, app, cfg)
 	routes.InitAddressRoutes(router, app, cfg)
+	routes.InitRoleRoutes(router, app, cfg)
 
 }

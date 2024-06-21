@@ -65,11 +65,11 @@ func Login(app *service.AppContainer) tcp.HandlerFunc {
 			}
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "you are logged in successfully",
-			"token":   token,
+			"data":    map[string]any{"token": token},
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

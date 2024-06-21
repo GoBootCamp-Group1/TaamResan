@@ -48,10 +48,10 @@ func UpdateProfile(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "your profile had been updated successfully",
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

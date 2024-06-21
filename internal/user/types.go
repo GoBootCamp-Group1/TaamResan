@@ -1,6 +1,7 @@
 package user
 
 import (
+	"TaamResan/internal/role"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -12,7 +13,6 @@ import (
 type Repo interface {
 	Create(ctx context.Context, user *User) error
 	Update(ctx context.Context, user *User) error
-	GetByID(ctx context.Context, id uint) (*User, error)
 	GetByMobile(ctx context.Context, mobile string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 }
@@ -20,30 +20,6 @@ type Repo interface {
 var (
 	ErrUserNotFound    = errors.New("user not found")
 	ErrInvalidPassword = errors.New("invalid user password")
-)
-
-type Role uint8
-
-func (ur Role) String() string {
-	switch ur {
-	case Customer:
-		return "customer"
-	case Admin:
-		return "admin"
-	case RestaurantOwner:
-		return "restaurant owner"
-	case RestaurantOperator:
-		return "restaurant operator"
-	default:
-		return "unknown"
-	}
-}
-
-const (
-	Customer Role = iota + 1
-	Admin
-	RestaurantOwner
-	RestaurantOperator
 )
 
 type User struct {
@@ -54,7 +30,7 @@ type User struct {
 	Mobile    string
 	BirthDate time.Time
 	Password  string
-	Roles     []Role
+	Roles     []role.Role
 }
 
 func HashPassword(password string) string {

@@ -23,7 +23,6 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 		var reqParams RequestBody
 
 		err := request.ExtractBodyParamsInto(&reqParams)
-		//err := json.Unmarshal([]byte(request.Body), &reqParams)
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
 			return
@@ -31,14 +30,17 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 
 		nameValidator := validator.Validate(reqParams.Name).MinLength(3)
 		phoneValidator := validator.Validate(reqParams.Phone).Phone()
-		emailValidator := validator.Validate(reqParams.Email).Email()
 		passwordValidator := validator.Validate(reqParams.Password).Password()
 
 		var errors []string
 		errors = append(errors, nameValidator.Errors()...)
 		errors = append(errors, phoneValidator.Errors()...)
-		errors = append(errors, emailValidator.Errors()...)
 		errors = append(errors, passwordValidator.Errors()...)
+
+		if reqParams.Email != "" {
+			emailValidator := validator.Validate(reqParams.Email).Email()
+			errors = append(errors, emailValidator.Errors()...)
+		}
 
 		if len(errors) > 0 {
 			tcp.RespondJsonValidateError(conn, errors, tcp.INVALID_INPUT)
@@ -60,10 +62,10 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		responseData := map[string]any{
+		responseBody := map[string]any{
 			"message": "you are signed up successfully",
 		}
-		tcp.RespondJsonSuccess(conn, responseData)
+		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
 }

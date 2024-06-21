@@ -4,6 +4,7 @@ import (
 	"TaamResan/cmd/api/config"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
+	"TaamResan/internal/role"
 	"TaamResan/internal/user"
 	"log"
 
@@ -16,6 +17,7 @@ type AppContainer struct {
 	userService    *UserService
 	authService    *AuthService
 	addressService *AddressService
+	roleService *RoleService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -29,6 +31,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setUserService()
 	app.setAuthService()
 	app.setAddressService()
+	app.setRoleService()
 
 	return app, nil
 }
@@ -43,6 +46,10 @@ func (a *AppContainer) AuthService() *AuthService {
 
 func (a *AppContainer) AddressService() *AddressService {
 	return a.addressService
+}
+
+func (a *AppContainer) RoleService() *RoleService {
+	return a.roleService
 }
 
 func (a *AppContainer) setUserService() {
@@ -81,4 +88,11 @@ func (a *AppContainer) setAddressService() {
 	}
 
 	a.addressService = NewAddressService(address.NewOps(storage2.NewAddressRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setRoleService() {
+	if a.roleService != nil {
+		return
+	}
+	a.roleService = NewRoleService(role.NewOps(storage2.NewRoleRepo(a.dbConn)))
 }

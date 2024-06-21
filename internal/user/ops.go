@@ -40,10 +40,6 @@ func (o *Ops) Update(ctx context.Context, user *User) error {
 	return o.repo.Update(ctx, user)
 }
 
-func (o *Ops) GetUserByID(ctx context.Context, id uint) (*User, error) {
-	return o.repo.GetByID(ctx, id)
-}
-
 func (o *Ops) GetUserByMobileAndPassword(ctx context.Context, mobile, password string) (*User, error) {
 	user, err := o.repo.GetByMobile(ctx, mobile)
 	if err != nil {
