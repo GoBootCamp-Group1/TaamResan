@@ -25,7 +25,7 @@ func Run(cfg config.Server, app *service.AppContainer) {
 	}
 
 	// Define listener
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Host, cfg.HttpPort))
 	if err != nil {
 		fmt.Println("Error starting TCP server:", err)
 		return

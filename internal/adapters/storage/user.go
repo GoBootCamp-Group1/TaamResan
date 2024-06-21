@@ -7,6 +7,7 @@ import (
 	"TaamResan/internal/user"
 	"context"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -44,6 +45,16 @@ func (r *userRepo) Create(ctx context.Context, user *user.User) error {
 			})
 		}
 		if err = tx.Create(&userRoles).Error; err != nil {
+			return err
+		}
+
+		//Create Wallet
+		fmt.Println(entity.ID)
+		walletEntity := entities.Wallet{
+			UserID: entity.ID,
+			Credit: 0.0,
+		}
+		if err = tx.Create(&walletEntity).Error; err != nil {
 			return err
 		}
 
