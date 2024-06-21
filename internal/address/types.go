@@ -6,10 +6,10 @@ import (
 )
 
 type Address struct {
-	ID    uint    `json:"id"`
-	Title string  `json:"title"`
-	Lat   float64 `json:"lat"`
-	Lng   float64 `json:"lng"`
+	ID    uint    //`json:"id"`
+	Title string  //`json:"title"`
+	Lat   float64 //`json:"lat"`
+	Lng   float64 //`json:"lng"`
 }
 
 type Repo interface {
