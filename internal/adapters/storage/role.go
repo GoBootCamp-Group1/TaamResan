@@ -20,13 +20,12 @@ func NewRoleRepo(db *gorm.DB) role.Repo {
 }
 
 var (
-	ErrCreatingRole        = errors.New("error creating role")
-	ErrUpdatingRole        = errors.New("error updating role")
-	ErrDeletingRole        = errors.New("error deleting role")
-	ErrRoleNotFound        = errors.New("role doesn't exist")
-	ErrRoleExists          = errors.New("role already exists")
-	ErrNonUniqueRoleName   = errors.New("role with this name exists")
-	ErrNotEnoughParameters = errors.New("not enough parameters")
+	ErrCreatingRole      = errors.New("error creating role")
+	ErrUpdatingRole      = errors.New("error updating role")
+	ErrDeletingRole      = errors.New("error deleting role")
+	ErrRoleNotFound      = errors.New("role doesn't exist")
+	ErrRoleExists        = errors.New("role already exists")
+	ErrNonUniqueRoleName = errors.New("role with this name exists")
 )
 
 func (r roleRepo) Create(ctx context.Context, role *role.Role) error {
