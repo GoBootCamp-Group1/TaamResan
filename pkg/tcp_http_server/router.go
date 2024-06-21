@@ -7,16 +7,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 type Request struct {
-	Method  string
-	Uri     string
-	Body    string
-	Headers map[string]string
-	ctx     context.Context
+	Method    string
+	Uri       string
+	Body      string
+	Headers   map[string]string
+	UrlParams map[string]string
+	ctx       context.Context
 }
 
 func (r *Request) Context() context.Context {
@@ -36,7 +38,7 @@ func (r *Request) WithContext(ctx context.Context) *Request {
 	return r2
 }
 
-func (r *Request) ExtractParamsInto(mock any) error {
+func (r *Request) ExtractBodyParamsInto(mock any) error {
 	return json.Unmarshal([]byte(r.Body), &mock)
 }
 
@@ -63,24 +65,46 @@ func HandlerChain(handler HandlerFunc, middlewares ...MiddlewareFunc) HandlerFun
 }
 
 type route struct {
+	pattern *regexp.Regexp
+	method  string
+	keys    []string
 	handler HandlerFunc
 }
 
 // Router holds the route mappings and middleware.
 type Router struct {
-	routes map[string]route
+	routes []route
 }
 
 // NewRouter creates a new Router instance.
 func NewRouter() *Router {
 	return &Router{
-		routes: make(map[string]route),
+		routes: []route{},
 	}
 }
 
 // HandleFunc registers a handler with middlewares for the given method and pattern.
 func (r *Router) HandleFunc(methodAndPattern string, handler HandlerFunc) {
-	r.routes[methodAndPattern] = route{handler: handler}
+	methodAndPatternParts := strings.SplitN(methodAndPattern, " ", 2)
+	if len(methodAndPatternParts) != 2 {
+		panic("Invalid method and pattern")
+	}
+	method := methodAndPatternParts[0]
+	pattern := methodAndPatternParts[1]
+	regex, keys := patternToRegex(pattern)
+	r.routes = append(r.routes, route{pattern: regex, method: method, keys: keys, handler: handler})
+}
+
+func patternToRegex(pattern string) (*regexp.Regexp, []string) {
+	var keys []string
+	regexPattern := "^" + regexp.QuoteMeta(pattern)
+	regexPattern = strings.ReplaceAll(regexPattern, `\\:`, `:`)
+	regexPattern = regexp.MustCompile(`:[^/]+`).ReplaceAllStringFunc(regexPattern, func(param string) string {
+		keys = append(keys, param[1:])
+		return `([^/]+)`
+	})
+	regexPattern += `$`
+	return regexp.MustCompile(regexPattern), keys
 }
 
 // Serve handles incoming connections and routes them to the appropriate handler.
@@ -90,11 +114,9 @@ func (r *Router) Serve(conn net.Conn) {
 
 	requestLine, err := reader.ReadString('\n')
 	if err != nil {
-		//fmt.Println("Error reading request line:", err)
 		return
 	}
 	requestLine = strings.TrimSpace(requestLine)
-	//fmt.Println("Request Line:", requestLine)
 
 	// Parse the request line
 	parts := strings.Split(requestLine, " ")
@@ -104,11 +126,6 @@ func (r *Router) Serve(conn net.Conn) {
 	}
 	method := parts[0]
 	uri := parts[1]
-	//protocol := parts[2]
-
-	//fmt.Println("Method:", method)
-	//fmt.Println("URI:", uri)
-	//fmt.Println("Protocol:", protocol)
 
 	// Read headers
 	headers := make(map[string]string)
@@ -127,10 +144,13 @@ func (r *Router) Serve(conn net.Conn) {
 			headers[headerParts[0]] = headerParts[1]
 		}
 	}
-	//fmt.Println("Headers:", headers)
 
 	// Handle the request body if present ONLY for POST and PUT
 	var body string
+
+	fmt.Println(body)
+	fmt.Println(method)
+
 	if method == "POST" || method == "PUT" {
 		contentLength := headers["Content-Length"]
 		if contentLength != "" {
@@ -146,29 +166,32 @@ func (r *Router) Serve(conn net.Conn) {
 				return
 			}
 			body = string(bodyBytes)
-			//fmt.Println("Body:", body)
 		}
 	}
 
 	// Route the request
-	uriWithoutQueryParams := strings.Split(uri, "?")[0]
-	key := method + " " + uriWithoutQueryParams
+	for _, route := range r.routes {
+		if route.pattern.MatchString(uri) && route.method == method {
+			matches := route.pattern.FindStringSubmatch(uri)
+			urlParams := make(map[string]string)
+			for i, match := range matches[1:] {
+				urlParams[route.keys[i]] = match
+			}
 
-	if route, ok := r.routes[key]; ok {
-
-		//sending parsed request
-		request := Request{
-			Method:  method,
-			Uri:     uri,
-			Body:    body,
-			Headers: headers,
-			ctx:     context.Background(),
+			request := &Request{
+				Method:    method,
+				Uri:       uri,
+				Body:      body,
+				Headers:   headers,
+				UrlParams: urlParams,
+				ctx:       context.Background(),
+			}
+			route.handler(conn, request)
+			return
 		}
-
-		route.handler(conn, &request)
-	} else {
-		HttpNotFound(conn)
 	}
+
+	HttpNotFound(conn)
 }
 
 // HttpNotFound writes a 404 Not Found response.

@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"unicode"
 )
 
@@ -100,4 +101,11 @@ func (v *Validator) Errors() []string {
 
 func (v *Validator) HasErrors() bool {
 	return len(v.errors) > 0
+}
+
+func (v *Validator) IsFloat() *Validator {
+	if _, err := strconv.ParseFloat(v.value, 10); err != nil || v.value == "" {
+		v.errors = append(v.errors, fmt.Sprintf("%s is invalid float", v.value))
+	}
+	return v
 }

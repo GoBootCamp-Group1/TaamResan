@@ -66,5 +66,6 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 	))
 
 	routes.InitUserRoutes(router, app, cfg)
+	routes.InitAddressRoutes(router, app, cfg)
 
 }
