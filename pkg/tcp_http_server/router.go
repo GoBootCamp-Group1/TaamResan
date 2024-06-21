@@ -66,6 +66,7 @@ func HandlerChain(handler HandlerFunc, middlewares ...MiddlewareFunc) HandlerFun
 
 type route struct {
 	pattern *regexp.Regexp
+	method  string
 	keys    []string
 	handler HandlerFunc
 }
@@ -88,10 +89,10 @@ func (r *Router) HandleFunc(methodAndPattern string, handler HandlerFunc) {
 	if len(methodAndPatternParts) != 2 {
 		panic("Invalid method and pattern")
 	}
-	//method := methodAndPatternParts[0]
+	method := methodAndPatternParts[0]
 	pattern := methodAndPatternParts[1]
 	regex, keys := patternToRegex(pattern)
-	r.routes = append(r.routes, route{pattern: regex, keys: keys, handler: handler})
+	r.routes = append(r.routes, route{pattern: regex, method: method, keys: keys, handler: handler})
 }
 
 func patternToRegex(pattern string) (*regexp.Regexp, []string) {
@@ -146,6 +147,10 @@ func (r *Router) Serve(conn net.Conn) {
 
 	// Handle the request body if present ONLY for POST and PUT
 	var body string
+
+	fmt.Println(body)
+	fmt.Println(method)
+
 	if method == "POST" || method == "PUT" {
 		contentLength := headers["Content-Length"]
 		if contentLength != "" {
@@ -166,7 +171,7 @@ func (r *Router) Serve(conn net.Conn) {
 
 	// Route the request
 	for _, route := range r.routes {
-		if route.pattern.MatchString(uri) {
+		if route.pattern.MatchString(uri) && route.method == method {
 			matches := route.pattern.FindStringSubmatch(uri)
 			urlParams := make(map[string]string)
 			for i, match := range matches[1:] {

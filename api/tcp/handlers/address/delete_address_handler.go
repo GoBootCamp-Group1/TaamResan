@@ -4,16 +4,12 @@ import (
 	"TaamResan/internal/address"
 	tcp "TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
-	"fmt"
 	"net"
 	"strconv"
 )
 
 func DeleteAddress(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
-
-		fmt.Println("came")
-
 		//get address id from url params
 		addressId, parseErr := strconv.ParseUint(request.UrlParams["addressId"], 10, 64)
 

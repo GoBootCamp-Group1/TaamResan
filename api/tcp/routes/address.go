@@ -35,7 +35,7 @@ func InitAddressRoutes(router *tcp_http_server.Router, app *service.AppContainer
 
 	router.HandleFunc("DELETE /addresses/:addressId", tcp_http_server.HandlerChain(
 		address.DeleteAddress(app),
-		//middlewares.LoggingMiddleware,
-		//middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 }

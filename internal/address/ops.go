@@ -1,6 +1,8 @@
 package address
 
-import "context"
+import (
+	"context"
+)
 
 type Ops struct {
 	repo Repo
