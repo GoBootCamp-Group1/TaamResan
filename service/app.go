@@ -6,6 +6,7 @@ import (
 	"TaamResan/internal/address"
 	"TaamResan/internal/role"
 	"TaamResan/internal/user"
+	"TaamResan/internal/wallet"
 	"log"
 
 	"gorm.io/gorm"
@@ -17,7 +18,8 @@ type AppContainer struct {
 	userService    *UserService
 	authService    *AuthService
 	addressService *AddressService
-	roleService *RoleService
+	roleService    *RoleService
+	walletService  *WalletService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -32,6 +34,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setAuthService()
 	app.setAddressService()
 	app.setRoleService()
+	app.setWalletService()
 
 	return app, nil
 }
@@ -50,6 +53,10 @@ func (a *AppContainer) AddressService() *AddressService {
 
 func (a *AppContainer) RoleService() *RoleService {
 	return a.roleService
+}
+
+func (a *AppContainer) WalletService() *WalletService {
+	return a.walletService
 }
 
 func (a *AppContainer) setUserService() {
@@ -95,4 +102,11 @@ func (a *AppContainer) setRoleService() {
 		return
 	}
 	a.roleService = NewRoleService(role.NewOps(storage2.NewRoleRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setWalletService() {
+	if a.walletService != nil {
+		return
+	}
+	a.walletService = NewWalletService(wallet.NewOps(storage2.NewWalletRepo(a.dbConn)))
 }

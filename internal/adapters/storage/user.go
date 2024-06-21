@@ -47,6 +47,15 @@ func (r *userRepo) Create(ctx context.Context, user *user.User) error {
 			return err
 		}
 
+		//Create Wallet
+		walletEntity := entities.Wallet{
+			UserID: entity.ID,
+			Credit: 0.0,
+		}
+		if err = tx.Create(&walletEntity).Error; err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
