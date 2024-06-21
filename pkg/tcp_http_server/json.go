@@ -46,7 +46,7 @@ func RespondJsonValidateError(conn net.Conn, errors []string, statusCode int) {
 }
 
 // RespondJsonSuccess writes an error response to the client.
-func RespondJsonSuccess(conn net.Conn, responseBody map[string]any) {
+func RespondJsonSuccess(conn net.Conn, responseBody any) {
 	RespondJson(conn, responseBody, OK)
 }
 
