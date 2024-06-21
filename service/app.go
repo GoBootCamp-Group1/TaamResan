@@ -3,6 +3,7 @@ package service
 import (
 	"TaamResan/cmd/api/config"
 	storage2 "TaamResan/internal/adapters/storage"
+	"TaamResan/internal/address"
 	"TaamResan/internal/role"
 	"TaamResan/internal/user"
 	"log"
@@ -11,10 +12,11 @@ import (
 )
 
 type AppContainer struct {
-	cfg         config.Config
-	dbConn      *gorm.DB
-	userService *UserService
-	authService *AuthService
+	cfg            config.Config
+	dbConn         *gorm.DB
+	userService    *UserService
+	authService    *AuthService
+	addressService *AddressService
 	roleService *RoleService
 }
 
@@ -28,6 +30,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 
 	app.setUserService()
 	app.setAuthService()
+	app.setAddressService()
 	app.setRoleService()
 
 	return app, nil
@@ -39,6 +42,10 @@ func (a *AppContainer) UserService() *UserService {
 
 func (a *AppContainer) AuthService() *AuthService {
 	return a.authService
+}
+
+func (a *AppContainer) AddressService() *AddressService {
+	return a.addressService
 }
 
 func (a *AppContainer) RoleService() *RoleService {
@@ -73,6 +80,14 @@ func (a *AppContainer) setAuthService() {
 	a.authService = NewAuthService(user.NewOps(storage2.NewUserRepo(a.dbConn)), []byte(a.cfg.Server.TokenSecret),
 		a.cfg.Server.TokenExpMinutes,
 		a.cfg.Server.RefreshTokenExpMinutes)
+}
+
+func (a *AppContainer) setAddressService() {
+	if a.addressService != nil {
+		return
+	}
+
+	a.addressService = NewAddressService(address.NewOps(storage2.NewAddressRepo(a.dbConn)))
 }
 
 func (a *AppContainer) setRoleService() {

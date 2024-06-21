@@ -22,7 +22,7 @@ func SignUp(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
 		var reqParams RequestBody
 
-		err := request.ExtractParamsInto(&reqParams)
+		err := request.ExtractBodyParamsInto(&reqParams)
 		//err := json.Unmarshal([]byte(request.Body), &reqParams)
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
