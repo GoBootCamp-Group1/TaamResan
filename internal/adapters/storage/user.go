@@ -88,3 +88,16 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*user.User, er
 	}
 	return mappers.UserEntityToDomain(&user), nil
 }
+
+//// TODO:REVIEW
+//func (r *userRepo) GetUserActiveWallet(ctx context.Context, userId uint) (*wallet.Wallet, error) {
+//	var w entities.Wallet
+//	err := r.db.WithContext(ctx).Model(&entities.Wallet{}).Where("user_id = ?", userId).First(&w).Error
+//	if err != nil {
+//		if errors.Is(err, gorm.ErrRecordNotFound) {
+//			return nil, err
+//		}
+//		return nil, err
+//	}
+//	return mappers.WalletEntityToDomain(&w), nil
+//}

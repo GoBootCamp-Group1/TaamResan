@@ -15,6 +15,7 @@ type Repo interface {
 	Update(ctx context.Context, user *User) error
 	GetByMobile(ctx context.Context, mobile string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
+	//GetUserActiveWallet(ctx context.Context, userId uint) (*wallet.Wallet, error)
 }
 
 var (

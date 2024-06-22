@@ -2,6 +2,7 @@ package storage
 
 import (
 	"TaamResan/internal/adapters/storage/entities"
+	"TaamResan/internal/adapters/storage/mappers"
 	"TaamResan/internal/wallet"
 	"TaamResan/pkg/jwt"
 	"context"
@@ -66,4 +67,25 @@ func (w *walletRepo) TopUp(ctx context.Context, wallet *wallet.Wallet, amount fl
 func (w *walletRepo) Expense(ctx context.Context, wallet *wallet.Wallet, amount float64) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (w *walletRepo) StoreWalletCard(ctx context.Context, card *wallet.WalletCard) error {
+	//get wallet id
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+
+	var walletEntity entities.Wallet
+	if err := w.db.Debug().Model(&entities.Wallet{}).Where("user_id = ?", userID).Find(&walletEntity).Error; err != nil {
+		return err
+	}
+
+	walletCardEntity := mappers.DomainToWalletCardEntity(card)
+
+	walletCardEntity.WalletID = walletEntity.ID
+
+	//store in database
+	if err := w.db.Create(&walletCardEntity).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

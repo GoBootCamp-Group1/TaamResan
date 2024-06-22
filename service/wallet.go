@@ -50,3 +50,12 @@ func (s *WalletService) UpdateWallet(ctx context.Context, wallet *wallet.Wallet)
 
 	return nil
 }
+
+func (s *WalletService) CreateWalletCard(ctx context.Context, card *wallet.WalletCard) error {
+	err := s.walletOps.CreateWalletCard(ctx, card)
+	if err != nil {
+		return fmt.Errorf(ErrCreatingWallet.Error()+": %w", err)
+	}
+
+	return nil
+}
