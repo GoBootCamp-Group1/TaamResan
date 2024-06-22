@@ -4,6 +4,8 @@ import (
 	"TaamResan/cmd/api/config"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
+	"TaamResan/internal/restaurant"
+	"TaamResan/internal/restaurant_staff"
 	"TaamResan/internal/role"
 	"TaamResan/internal/user"
 	"TaamResan/internal/wallet"
@@ -13,13 +15,15 @@ import (
 )
 
 type AppContainer struct {
-	cfg            config.Config
-	dbConn         *gorm.DB
-	userService    *UserService
-	authService    *AuthService
-	addressService *AddressService
-	roleService    *RoleService
-	walletService  *WalletService
+	cfg                    config.Config
+	dbConn                 *gorm.DB
+	userService            *UserService
+	authService            *AuthService
+	addressService         *AddressService
+	roleService            *RoleService
+	walletService          *WalletService
+	restaurantService      *RestaurantService
+	restaurantStaffService *RestaurantStaffService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -35,6 +39,8 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setAddressService()
 	app.setRoleService()
 	app.setWalletService()
+	app.setRestaurantService()
+	app.setRestaurantStaffService()
 
 	return app, nil
 }
@@ -57,6 +63,12 @@ func (a *AppContainer) RoleService() *RoleService {
 
 func (a *AppContainer) WalletService() *WalletService {
 	return a.walletService
+}
+
+func (a *AppContainer) RestaurantService() *RestaurantService { return a.restaurantService }
+
+func (a *AppContainer) RestaurantStaffService() *RestaurantStaffService {
+	return a.restaurantStaffService
 }
 
 func (a *AppContainer) setUserService() {
@@ -109,4 +121,18 @@ func (a *AppContainer) setWalletService() {
 		return
 	}
 	a.walletService = NewWalletService(wallet.NewOps(storage2.NewWalletRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setRestaurantService() {
+	if a.restaurantService != nil {
+		return
+	}
+	a.restaurantService = NewRestaurantService(restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setRestaurantStaffService() {
+	if a.restaurantStaffService != nil {
+		return
+	}
+	a.restaurantStaffService = NewRestaurantStaffService(restaurant_staff.NewOps(storage2.NewRestaurantStaffRepo(a.dbConn)))
 }
