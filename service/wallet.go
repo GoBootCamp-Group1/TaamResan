@@ -12,10 +12,11 @@ type WalletService struct {
 }
 
 var (
-	ErrFetchingWallet = errors.New("can not fetch wallet")
-	ErrCreatingWallet = errors.New("can not create wallet")
-	ErrUpdatingWallet = errors.New("can not update wallet")
-	ErrDeletingWallet = errors.New("can not delete wallet")
+	ErrFetchingWallet      = errors.New("can not fetch wallet")
+	ErrCreatingWallet      = errors.New("can not create wallet")
+	ErrUpdatingWallet      = errors.New("can not update wallet")
+	ErrDeletingWallet      = errors.New("can not delete wallet")
+	ErrCreatingWalletTopUp = errors.New("can not top-up wallet")
 )
 
 func NewWalletService(walletOps *wallet.Ops) *WalletService {
@@ -64,6 +65,15 @@ func (s *WalletService) DeleteWalletCard(ctx context.Context, card *wallet.Walle
 	err := s.walletOps.DeleteWalletCard(ctx, card)
 	if err != nil {
 		return fmt.Errorf(ErrCreatingWallet.Error()+": %w", err)
+	}
+
+	return nil
+}
+
+func (s *WalletService) TopUp(ctx context.Context, w *wallet.WalletTopUp) error {
+	err := s.walletOps.TopUp(ctx, w)
+	if err != nil {
+		return fmt.Errorf(ErrCreatingWalletTopUp.Error()+": %w", err)
 	}
 
 	return nil

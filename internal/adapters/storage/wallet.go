@@ -11,7 +11,8 @@ import (
 )
 
 type walletRepo struct {
-	db *gorm.DB
+	db       *gorm.DB
+	userRepo userRepo
 }
 
 func NewWalletRepo(db *gorm.DB) wallet.Repo {
@@ -60,14 +61,64 @@ func (w *walletRepo) Delete(ctx context.Context, wallet *wallet.Wallet) error {
 	panic("implement me")
 }
 
-func (w *walletRepo) TopUp(ctx context.Context, wallet *wallet.Wallet, amount float64) error {
-	//TODO implement me
-	panic("implement me")
+func (w *walletRepo) TopUp(ctx context.Context, walletTopUp *wallet.WalletTopUp) error {
+	//check for card existence
+	var walletCard entities.WalletCard
+	if err := w.db.WithContext(ctx).Model(&entities.WalletCard{}).Where("number = ?", walletTopUp.CardNumber).Find(&walletCard).Error; err != nil {
+		return err
+	}
+
+	if walletCard.ID == 0 {
+		return fmt.Errorf("card number is not registered in our system")
+	}
+
+	return w.db.Transaction(func(tx *gorm.DB) error {
+		//fetch wallet
+		userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+		walletEntity, walletFetchErr := w.GetUserActiveWallet(ctx, userID)
+		if walletFetchErr != nil {
+			return walletFetchErr
+		}
+
+		//charge wallet
+		walletEntity.Credit += walletTopUp.Amount
+		if err := tx.Save(&walletEntity).Error; err != nil {
+			return err
+		}
+		//store transaction
+		transaction := entities.WalletTransaction{
+			WalletID: walletEntity.ID,
+			Type:     wallet.TRANSACTION_TYPE_TOPUP,
+			Status:   wallet.TRANSACTION_STATUS_DONE, // as we don't have real payment gateway
+			Amount:   walletTopUp.Amount,
+			Additional: map[string]interface{}{
+				"card_number": walletTopUp.CardNumber,
+			},
+		}
+		if err := tx.Save(&transaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (w *walletRepo) Expense(ctx context.Context, wallet *wallet.Wallet, amount float64) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (w *walletRepo) GetUserActiveWallet(ctx context.Context, userId uint) (entities.Wallet, error) {
+	var walletEntity entities.Wallet
+	if err := w.db.WithContext(ctx).Model(&entities.Wallet{}).Where("user_id = ?", userId).Find(&walletEntity).Error; err != nil {
+		return entities.Wallet{}, err
+	}
+
+	if walletEntity.ID == 0 {
+		return entities.Wallet{}, fmt.Errorf("wallet not found for this user")
+	}
+
+	return walletEntity, nil
 }
 
 func (w *walletRepo) StoreWalletCard(ctx context.Context, card *wallet.WalletCard) error {
