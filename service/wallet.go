@@ -59,3 +59,12 @@ func (s *WalletService) CreateWalletCard(ctx context.Context, card *wallet.Walle
 
 	return nil
 }
+
+func (s *WalletService) DeleteWalletCard(ctx context.Context, card *wallet.WalletCard) error {
+	err := s.walletOps.DeleteWalletCard(ctx, card)
+	if err != nil {
+		return fmt.Errorf(ErrCreatingWallet.Error()+": %w", err)
+	}
+
+	return nil
+}

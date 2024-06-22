@@ -28,4 +28,5 @@ type Repo interface {
 	Expense(ctx context.Context, wallet *Wallet, amount float64) error
 
 	StoreWalletCard(ctx context.Context, card *WalletCard) error
+	DeleteWalletCard(ctx context.Context, card *WalletCard) error
 }

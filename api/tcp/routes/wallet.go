@@ -15,4 +15,10 @@ func InitWalletRoutes(router *tcp_http_server.Router, app *service.AppContainer,
 		middlewares.LoggingMiddleware,
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
+
+	router.HandleFunc("DELETE /wallet/cards/:cardId", tcp_http_server.HandlerChain(
+		cards.DeleteWalletCard(app),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
 }

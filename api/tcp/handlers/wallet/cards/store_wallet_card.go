@@ -41,7 +41,7 @@ func StoreWalletCard(app *service.AppContainer) tcp.HandlerFunc {
 
 		//show response result
 		responseBody := map[string]any{
-			"message": "your address had been created successfully",
+			"message": "your card had been created successfully",
 		}
 
 		tcp.RespondJsonSuccess(conn, responseBody)
@@ -56,7 +56,7 @@ func validateStoreWalletInputs(conn net.Conn, reqParams *StoreWalletCardRequest)
 	errors = append(errors, bankNameValidator.Errors()...)
 	titleValidator := validator.Validate(reqParams.Title).MinLength(3)
 	errors = append(errors, titleValidator.Errors()...)
-	numberValidator := validator.Validate(reqParams.Number).RegMatch(`^d{16}$`)
+	numberValidator := validator.Validate(reqParams.Number).RegMatch(`^\d{16}$`)
 	errors = append(errors, numberValidator.Errors()...)
 
 	if len(errors) > 0 {
