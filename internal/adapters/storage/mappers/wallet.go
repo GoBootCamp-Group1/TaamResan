@@ -18,3 +18,21 @@ func DomainToWalletEntity(model *wallet.Wallet) *entities.Wallet {
 		Credit: model.Credit,
 	}
 }
+
+func WalletCardEntityToDomain(entity *entities.WalletCard) *wallet.WalletCard {
+	return &wallet.WalletCard{
+		ID:       entity.ID,
+		Title:    entity.Title,
+		BankName: entity.BankName,
+		Number:   entity.Number,
+	}
+}
+
+func DomainToWalletCardEntity(model *wallet.WalletCard) *entities.WalletCard {
+	return &entities.WalletCard{
+		ID:       model.ID,
+		Title:    model.Title,
+		BankName: model.BankName,
+		Number:   model.Number,
+	}
+}

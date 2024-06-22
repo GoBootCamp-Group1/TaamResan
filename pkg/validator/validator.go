@@ -94,6 +94,14 @@ func (v *Validator) Password() *Validator {
 	return v
 }
 
+func (v *Validator) RegMatch(pattern string) *Validator {
+	re := regexp.MustCompile(pattern)
+	if !re.MatchString(v.value) {
+		v.errors = append(v.errors, fmt.Sprintf("%s is invalid.", v.value))
+	}
+	return v
+}
+
 // Errors returns the validation errors.
 func (v *Validator) Errors() []string {
 	return v.errors

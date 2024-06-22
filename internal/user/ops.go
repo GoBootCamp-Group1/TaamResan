@@ -73,3 +73,12 @@ func (o *Ops) GetUserByEmailAndPassword(ctx context.Context, email, password str
 
 	return user, nil
 }
+
+//func (o *Ops) GetUserActiveWallet(ctx context.Context, userId uint) (*wallet.Wallet, error) {
+//	w, err := o.repo.GetUserActiveWallet(ctx, userId)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return w, nil
+//}

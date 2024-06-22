@@ -11,3 +11,13 @@ type Wallet struct {
 	UserID uint // Foreign key
 	User   User // Associate
 }
+
+type WalletCard struct {
+	gorm.Model
+	ID       uint
+	Wallet   Wallet
+	WalletID uint
+	Title    string
+	BankName string
+	Number   string
+}
