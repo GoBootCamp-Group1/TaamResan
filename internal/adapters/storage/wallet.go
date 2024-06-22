@@ -43,7 +43,7 @@ func (w *walletRepo) CreateForUserID(ctx context.Context, userId uint) error {
 		UserID: userId,
 	}
 
-	if err := w.db.Create(&walletEntity).Error; err != nil {
+	if err := w.db.WithContext(ctx).Create(&walletEntity).Error; err != nil {
 		return err
 	}
 
@@ -75,13 +75,13 @@ func (w *walletRepo) StoreWalletCard(ctx context.Context, card *wallet.WalletCar
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 
 	var walletEntity entities.Wallet
-	if err := w.db.Model(&entities.Wallet{}).Where("user_id = ?", userID).Find(&walletEntity).Error; err != nil {
+	if err := w.db.WithContext(ctx).Model(&entities.Wallet{}).Where("user_id = ?", userID).Find(&walletEntity).Error; err != nil {
 		return err
 	}
 
 	//check if already exists in database?
 	var existedCard entities.WalletCard
-	if err := w.db.Model(&entities.WalletCard{}).Where("number = ?", card.Number).Find(&existedCard).Error; err != nil {
+	if err := w.db.WithContext(ctx).Model(&entities.WalletCard{}).Where("number = ?", card.Number).Find(&existedCard).Error; err != nil {
 		return err
 	}
 
@@ -94,7 +94,7 @@ func (w *walletRepo) StoreWalletCard(ctx context.Context, card *wallet.WalletCar
 	walletCardEntity.WalletID = walletEntity.ID
 
 	//store in database
-	if err := w.db.Create(&walletCardEntity).Error; err != nil {
+	if err := w.db.WithContext(ctx).Create(&walletCardEntity).Error; err != nil {
 		return err
 	}
 
@@ -106,7 +106,7 @@ func (w *walletRepo) DeleteWalletCard(ctx context.Context, card *wallet.WalletCa
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 
 	var walletEntity entities.Wallet
-	if err := w.db.Model(&entities.Wallet{}).Where("user_id = ?", userID).Find(&walletEntity).Error; err != nil {
+	if err := w.db.WithContext(ctx).Model(&entities.Wallet{}).Where("user_id = ?", userID).Find(&walletEntity).Error; err != nil {
 		return err
 	}
 
@@ -118,7 +118,7 @@ func (w *walletRepo) DeleteWalletCard(ctx context.Context, card *wallet.WalletCa
 	walletCardEntity := mappers.DomainToWalletCardEntity(card)
 
 	//store in database
-	if err := w.db.Delete(&walletCardEntity).Error; err != nil {
+	if err := w.db.WithContext(ctx).Delete(&walletCardEntity).Error; err != nil {
 		return err
 	}
 
