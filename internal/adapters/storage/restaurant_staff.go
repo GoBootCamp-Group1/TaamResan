@@ -33,6 +33,10 @@ func (r *restaurantStaffRepo) Create(ctx context.Context, rStaff *restaurant_sta
 		return 0, ErrRestaurantStaffExists
 	}
 
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, ErrCreatingRestaurantStaff
+	}
+
 	err = r.db.Transaction(func(tx *gorm.DB) error {
 		entity := mappers.DomainToRestaurantStaffEntity(rStaff)
 		err = tx.WithContext(ctx).Model(&entities.RestaurantStaff{}).Create(&entity).Error

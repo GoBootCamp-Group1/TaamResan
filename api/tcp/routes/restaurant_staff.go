@@ -14,4 +14,16 @@ func InitRestaurantStaffRoutes(router *tcp_http_server.Router, app *service.AppC
 		middlewares.LoggingMiddleware,
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
+
+	router.HandleFunc("DELETE /restaurant-staff/:id", tcp_http_server.HandlerChain(
+		restaurant_staff_handlers.Delete(app),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
+
+	router.HandleFunc("GET /restaurant-staff/:restaurant_id", tcp_http_server.HandlerChain(
+		restaurant_staff_handlers.GetAllByRestaurant(app),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
 }

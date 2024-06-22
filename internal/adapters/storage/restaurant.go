@@ -254,11 +254,28 @@ func (r *restaurantRepo) DelegateOwnership(ctx context.Context, id uint, newOwne
 			return ErrUpdatingRestaurant
 		}
 
-		// update restaurant staff (owner)
+		// soft delete previous
+		// create new restaurant staff (owner)
+		err = r.staffRepo.Delete(ctx, existingResStaff.ID)
+		if err != nil {
+			return ErrDeletingRestaurantStaff
+		}
+
+		newResStaff := &restaurant_staff.RestaurantStaff{
+			UserId:       newOwnerId,
+			RestaurantId: id,
+			Position:     restaurant_staff.Manager,
+		}
+
+		_, err = r.staffRepo.Create(ctx, newResStaff)
+		if err != nil {
+			return err
+		}
+
 		existingResStaff.UserId = newOwnerId
 		err = tx.WithContext(ctx).Model(&entities.RestaurantStaff{}).Where("id = ?", existingResStaff.ID).Save(&existingResStaff).Error
 		if err != nil {
-			return ErrUpdatingRestaurantStaff
+			return err
 		}
 
 		return nil
