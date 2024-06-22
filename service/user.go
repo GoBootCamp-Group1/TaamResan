@@ -17,8 +17,9 @@ func NewUserService(userOps *user.Ops) *UserService {
 }
 
 var (
-	ErrUserExists   = errors.New("user already exists")
-	ErrCreatingUser = errors.New("can not create user")
+	ErrUserExists            = errors.New("user already exists")
+	ErrCreatingUser          = errors.New("can not create user")
+	ErrNoActiveWalletForUser = errors.New("there is no active wallet for this user")
 )
 
 func (s *UserService) CreateUser(ctx context.Context, user *user.User) error {
@@ -62,3 +63,12 @@ func (s *UserService) UpdateUserProfile(ctx context.Context, u *user.User) error
 
 	return nil
 }
+
+//func (s *UserService) GetUserActiveWallet(ctx context.Context, userId uint) (*wallet.Wallet, error) {
+//	w, err := s.userOps.GetUserActiveWallet(ctx, userId)
+//	if err == nil {
+//		return nil, ErrNoActiveWalletForUser
+//	}
+//
+//	return w, nil
+//}

@@ -11,6 +11,14 @@ type Wallet struct {
 	User   user.User
 }
 
+type WalletCard struct {
+	ID       uint
+	Wallet   Wallet
+	BankName string
+	Title    string
+	Number   string
+}
+
 type Repo interface {
 	Create(ctx context.Context) error
 	CreateForUserID(ctx context.Context, userId uint) error
@@ -18,4 +26,7 @@ type Repo interface {
 	Delete(ctx context.Context, wallet *Wallet) error
 	TopUp(ctx context.Context, wallet *Wallet, amount float64) error
 	Expense(ctx context.Context, wallet *Wallet, amount float64) error
+
+	StoreWalletCard(ctx context.Context, card *WalletCard) error
+	DeleteWalletCard(ctx context.Context, card *WalletCard) error
 }

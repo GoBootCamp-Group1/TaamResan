@@ -37,3 +37,11 @@ func (o *Ops) TopUp(ctx context.Context, wallet *Wallet, amount float64) error {
 func (o *Ops) Expense(ctx context.Context, wallet *Wallet, amount float64) error {
 	return o.repo.Expense(ctx, wallet, amount)
 }
+
+func (o *Ops) CreateWalletCard(ctx context.Context, card *WalletCard) error {
+	return o.repo.StoreWalletCard(ctx, card)
+}
+
+func (o *Ops) DeleteWalletCard(ctx context.Context, card *WalletCard) error {
+	return o.repo.DeleteWalletCard(ctx, card)
+}
