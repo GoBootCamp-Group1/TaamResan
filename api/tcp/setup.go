@@ -79,5 +79,7 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 	routes.InitAddressRoutes(router, app, cfg)
 	routes.InitRoleRoutes(router, app, cfg)
 	routes.InitWalletRoutes(router, app, cfg)
+	routes.InitRestaurantRoutes(router, app, cfg)
+	routes.InitRestaurantStaffRoutes(router, app, cfg)
 
 }
