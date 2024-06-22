@@ -30,8 +30,8 @@ func (o *Ops) Delete(ctx context.Context, wallet *Wallet) error {
 	return o.repo.Delete(ctx, wallet)
 }
 
-func (o *Ops) TopUp(ctx context.Context, wallet *Wallet, amount float64) error {
-	return o.repo.TopUp(ctx, wallet, amount)
+func (o *Ops) TopUp(ctx context.Context, w *WalletTopUp) error {
+	return o.repo.TopUp(ctx, w)
 }
 
 func (o *Ops) Expense(ctx context.Context, wallet *Wallet, amount float64) error {

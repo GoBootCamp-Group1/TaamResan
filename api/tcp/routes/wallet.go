@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"TaamResan/api/tcp/handlers/wallet"
 	"TaamResan/api/tcp/handlers/wallet/cards"
 	"TaamResan/api/tcp/middlewares"
 	"TaamResan/cmd/api/config"
@@ -18,6 +19,12 @@ func InitWalletRoutes(router *tcp_http_server.Router, app *service.AppContainer,
 
 	router.HandleFunc("DELETE /wallet/cards/:cardId", tcp_http_server.HandlerChain(
 		cards.DeleteWalletCard(app),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
+
+	router.HandleFunc("POST /wallet/top-up", tcp_http_server.HandlerChain(
+		wallet.TopUp(app),
 		middlewares.LoggingMiddleware,
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
