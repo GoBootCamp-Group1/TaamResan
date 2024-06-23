@@ -13,19 +13,19 @@ func InitWalletRoutes(router *tcp_http_server.Router, app *service.AppContainer,
 	//store card for user wallet
 	router.HandleFunc("POST /wallet/cards", tcp_http_server.HandlerChain(
 		cards.StoreWalletCard(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("DELETE /wallet/cards/:cardId", tcp_http_server.HandlerChain(
 		cards.DeleteWalletCard(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("POST /wallet/top-up", tcp_http_server.HandlerChain(
 		wallet.TopUp(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 }
