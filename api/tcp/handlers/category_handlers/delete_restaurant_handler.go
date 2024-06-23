@@ -9,7 +9,7 @@ import (
 
 func Delete(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
-		id, parseErr := strconv.ParseUint(request.UrlParams["id"], 10, 64)
+		id, parseErr := strconv.ParseUint(request.UrlParams["category_id"], 10, 64)
 
 		if parseErr != nil {
 			tcp.RespondJsonError(conn, parseErr.Error(), tcp.NOT_FOUND)

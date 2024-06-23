@@ -6,16 +6,23 @@ import (
 	"TaamResan/pkg/validator"
 	"TaamResan/service"
 	"net"
+	"strconv"
 )
 
 type UpdateRequestBody struct {
-	ID       uint   `json:"id"`
 	ParentId *uint  `json:"parent_id"`
 	Name     string `json:"name"`
 }
 
 func Update(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
+		id, parseErr := strconv.ParseUint(request.UrlParams["category_id"], 10, 64)
+
+		if parseErr != nil {
+			tcp.RespondJsonError(conn, parseErr.Error(), tcp.NOT_FOUND)
+			return
+		}
+
 		var reqParams UpdateRequestBody
 
 		err := request.ExtractBodyParamsInto(&reqParams)
@@ -29,7 +36,7 @@ func Update(app *service.AppContainer) tcp.HandlerFunc {
 		userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
 
 		newCategory := category.Category{
-			ID:        reqParams.ID,
+			ID:        uint(id),
 			ParentId:  reqParams.ParentId,
 			CreatedBy: userId,
 			Name:      reqParams.Name,
@@ -54,10 +61,6 @@ func validateUpdateInputs(conn net.Conn, reqParams UpdateRequestBody) {
 
 	nameValidator := validator.Validate(reqParams.Name).MinLength(3)
 	errors = append(errors, nameValidator.Errors()...)
-
-	if reqParams.ID <= 0 {
-		errors = append(errors, "ID must be greater than 0")
-	}
 
 	if len(errors) > 0 {
 		tcp.RespondJsonValidateError(conn, errors, tcp.INVALID_INPUT)
