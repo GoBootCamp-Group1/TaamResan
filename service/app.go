@@ -2,6 +2,7 @@ package service
 
 import (
 	"TaamResan/cmd/api/config"
+	"TaamResan/internal/action_log"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
 	"TaamResan/internal/category"
@@ -25,6 +26,7 @@ type AppContainer struct {
 	walletService          *WalletService
 	restaurantService      *RestaurantService
 	restaurantStaffService *RestaurantStaffService
+	actionLogService       *ActionLogService
 	categoryService        *CategoryService
 }
 
@@ -43,6 +45,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setWalletService()
 	app.setRestaurantService()
 	app.setRestaurantStaffService()
+	app.setActionLogService()
 	app.setCategoryService()
 
 	return app, nil
@@ -74,6 +77,10 @@ func (a *AppContainer) CategoryService() *CategoryService { return a.categorySer
 
 func (a *AppContainer) RestaurantStaffService() *RestaurantStaffService {
 	return a.restaurantStaffService
+}
+
+func (a *AppContainer) ActionLogService() *ActionLogService {
+	return a.actionLogService
 }
 
 func (a *AppContainer) setUserService() {
@@ -140,6 +147,13 @@ func (a *AppContainer) setRestaurantStaffService() {
 		return
 	}
 	a.restaurantStaffService = NewRestaurantStaffService(restaurant_staff.NewOps(storage2.NewRestaurantStaffRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setActionLogService() {
+	if a.actionLogService != nil {
+		return
+	}
+	a.actionLogService = NewActionLogService(action_log.NewOps(storage2.NewActionLogRepo(a.dbConn)))
 }
 
 func (a *AppContainer) setCategoryService() {

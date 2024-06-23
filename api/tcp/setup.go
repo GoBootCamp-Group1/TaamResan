@@ -57,22 +57,22 @@ func Run(cfg config.Server, app *service.AppContainer) {
 func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContainer, cfg config.Server) {
 	router.HandleFunc("GET /", tcp_http_server.HandlerChain(
 		handlers.HomeHandler,
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 	))
 	router.HandleFunc("POST /todo", tcp_http_server.HandlerChain(
 		handlers.TodoHandler,
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("POST /signup", tcp_http_server.HandlerChain(
 		signup_handlers.SignUp(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 	))
 
 	router.HandleFunc("POST /login", tcp_http_server.HandlerChain(
 		authentication_handlers.Login(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 	))
 
 	routes.InitUserRoutes(router, app, cfg)

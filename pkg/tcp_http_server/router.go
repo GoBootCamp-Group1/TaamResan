@@ -17,6 +17,7 @@ type Request struct {
 	Method      string
 	Uri         string
 	Body        string
+	IP          string
 	Headers     map[string]string
 	UrlParams   map[string]string
 	QueryParams map[string]string
@@ -49,6 +50,15 @@ func (r *Request) GetClaims() *jwt.UserClaims {
 }
 
 func (r *Request) GetUserID() uint {
+	claims := r.Context().Value(jwt.UserClaimKey)
+
+	if claims == nil {
+		//TODO: err
+		return 0
+	}
+
+	return claims.(*jwt.UserClaims).UserID
+
 	return r.Context().Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 }
 
@@ -163,9 +173,6 @@ func (r *Router) Serve(conn net.Conn) {
 	// Handle the request body if present ONLY for POST and PUT
 	var body string
 
-	fmt.Println(body)
-	fmt.Println(method)
-
 	if method == "POST" || method == "PUT" {
 		contentLength := headers["Content-Length"]
 		if contentLength != "" {
@@ -197,6 +204,7 @@ func (r *Router) Serve(conn net.Conn) {
 				Method:    method,
 				Uri:       uri,
 				Body:      body,
+				IP:        conn.RemoteAddr().String(),
 				Headers:   headers,
 				UrlParams: urlParams,
 				ctx:       context.Background(),
