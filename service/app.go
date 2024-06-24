@@ -6,6 +6,8 @@ import (
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
 	"TaamResan/internal/category"
+	"TaamResan/internal/category_food"
+	"TaamResan/internal/food"
 	"TaamResan/internal/restaurant"
 	"TaamResan/internal/restaurant_staff"
 	"TaamResan/internal/role"
@@ -28,6 +30,8 @@ type AppContainer struct {
 	restaurantStaffService *RestaurantStaffService
 	actionLogService       *ActionLogService
 	categoryService        *CategoryService
+	foodService            *FoodService
+	categoryFoodService    *CategoryFoodService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -47,6 +51,8 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setRestaurantStaffService()
 	app.setActionLogService()
 	app.setCategoryService()
+	app.setFoodService()
+	app.setCategoryFoodService()
 
 	return app, nil
 }
@@ -74,6 +80,10 @@ func (a *AppContainer) WalletService() *WalletService {
 func (a *AppContainer) RestaurantService() *RestaurantService { return a.restaurantService }
 
 func (a *AppContainer) CategoryService() *CategoryService { return a.categoryService }
+
+func (a *AppContainer) FoodService() *FoodService { return a.foodService }
+
+func (a *AppContainer) CategoryFoodService() *CategoryFoodService { return a.categoryFoodService }
 
 func (a *AppContainer) RestaurantStaffService() *RestaurantStaffService {
 	return a.restaurantStaffService
@@ -161,4 +171,21 @@ func (a *AppContainer) setCategoryService() {
 		return
 	}
 	a.categoryService = NewCategoryService(category.NewOps(storage2.NewCategoryRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setFoodService() {
+	if a.foodService != nil {
+		return
+	}
+	a.foodService = NewFoodService(
+		food.NewOps(storage2.NewFoodRepo(a.dbConn)),
+		category.NewOps(storage2.NewCategoryRepo(a.dbConn)),
+	)
+}
+
+func (a *AppContainer) setCategoryFoodService() {
+	if a.categoryFoodService != nil {
+		return
+	}
+	a.categoryFoodService = NewCategoryFoodService(category_food.NewOps(storage2.NewCategoryFoodRepo(a.dbConn)))
 }

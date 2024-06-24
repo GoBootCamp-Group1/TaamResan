@@ -7,6 +7,7 @@ type Repo interface {
 	Update(ctx context.Context, category *Category) error
 	Delete(ctx context.Context, id uint) error
 	GetById(ctx context.Context, id uint) (*Category, error)
+	GetByName(ctx context.Context, name string, restaurantId uint) (*Category, error)
 	GetAll(ctx context.Context, restaurantId uint) ([]*Category, error)
 }
 
