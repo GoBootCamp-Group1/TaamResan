@@ -109,6 +109,16 @@ func (r *categoryRepo) GetById(ctx context.Context, id uint) (*category.Category
 	return existingCategory, nil
 }
 
+func (r *categoryRepo) GetByName(ctx context.Context, name string, restaurantId uint) (*category.Category, error) {
+	var existingCategory *category.Category
+	err := r.db.WithContext(ctx).Model(&category.Category{}).
+		Where("name = ? and restaurant_id = ?", name, restaurantId).First(&existingCategory).Error
+	if err != nil {
+		return nil, ErrCategoryNotFound
+	}
+	return existingCategory, nil
+}
+
 func (r *categoryRepo) GetAll(ctx context.Context, restaurantId uint) ([]*category.Category, error) {
 	var categories []*category.Category
 	err := r.db.WithContext(ctx).Model(&category.Category{}).Where("restaurant_id = ?", restaurantId).Find(&categories).Error

@@ -1,6 +1,9 @@
 package food
 
-import "context"
+import (
+	"TaamResan/internal/category"
+	"context"
+)
 
 type Repo interface {
 	Create(ctx context.Context, food *Food) (uint, error)
@@ -18,4 +21,5 @@ type Food struct {
 	Price              float64
 	CancelRate         float64
 	PreparationMinutes uint
+	Categories         []*category.Category
 }

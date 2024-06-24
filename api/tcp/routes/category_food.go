@@ -15,12 +15,6 @@ func InitCategoryFoodRoutes(router *tcp_http_server.Router, app *service.AppCont
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("PUT /category-foods/:category_food_id", tcp_http_server.HandlerChain(
-		category_food_handlers.Update(app),
-		middlewares.LoggingMiddleware,
-		middlewares.AuthMiddleware(cfg.TokenSecret),
-	))
-
 	router.HandleFunc("DELETE /category-foods/:category_food_id", tcp_http_server.HandlerChain(
 		category_food_handlers.Delete(app),
 		middlewares.LoggingMiddleware,
@@ -33,8 +27,14 @@ func InitCategoryFoodRoutes(router *tcp_http_server.Router, app *service.AppCont
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("GET /restaurants/:restaurant_id/category-foods", tcp_http_server.HandlerChain(
-		category_food_handlers.GetAll(app),
+	router.HandleFunc("GET /foods/:food_id/category-foods", tcp_http_server.HandlerChain(
+		category_food_handlers.GetAllByFood(app),
+		middlewares.LoggingMiddleware,
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
+
+	router.HandleFunc("GET /categories/:category_id/category-foods", tcp_http_server.HandlerChain(
+		category_food_handlers.GetAllByCategory(app),
 		middlewares.LoggingMiddleware,
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))

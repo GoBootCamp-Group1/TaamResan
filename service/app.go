@@ -163,7 +163,10 @@ func (a *AppContainer) setFoodService() {
 	if a.foodService != nil {
 		return
 	}
-	a.foodService = NewFoodService(food.NewOps(storage2.NewFoodRepo(a.dbConn)))
+	a.foodService = NewFoodService(
+		food.NewOps(storage2.NewFoodRepo(a.dbConn)),
+		category.NewOps(storage2.NewCategoryRepo(a.dbConn)),
+	)
 }
 
 func (a *AppContainer) setCategoryFoodService() {
