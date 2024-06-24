@@ -10,7 +10,6 @@ import (
 
 type CreateRequestBody struct {
 	RestaurantId       uint    `json:"restaurant_id"`
-	CreatedBy          uint    `json:"created_by"`
 	Name               string  `json:"name"`
 	Price              float64 `json:"price"`
 	CancelRate         float64 `json:"cancel_rate"`

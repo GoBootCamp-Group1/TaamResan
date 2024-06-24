@@ -84,13 +84,13 @@ func (r *foodRepo) Update(ctx context.Context, f *food.Food) error {
 }
 
 func (r *foodRepo) Delete(ctx context.Context, id uint) error {
-	var existingFood *food.Food
-	err := r.db.WithContext(ctx).Model(&food.Food{}).Where("id = ?", id).First(&existingFood).Error
+	var existingFood *entities.Food
+	err := r.db.WithContext(ctx).Model(&entities.Food{}).Where("id = ?", id).First(&existingFood).Error
 	if err != nil {
 		return ErrFoodNotFound
 	}
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		err = tx.WithContext(ctx).Model(&food.Food{}).Where("id = ?", id).Delete(&existingFood).Error
+		err = tx.WithContext(ctx).Model(&entities.Food{}).Where("id = ?", id).Delete(&existingFood).Error
 		if err != nil {
 			return ErrDeletingFood
 		}

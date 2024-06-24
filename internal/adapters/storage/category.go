@@ -85,13 +85,13 @@ func (r *categoryRepo) Update(ctx context.Context, cat *category.Category) error
 }
 
 func (r *categoryRepo) Delete(ctx context.Context, id uint) error {
-	var existingCategory *category.Category
-	err := r.db.WithContext(ctx).Model(&category.Category{}).Where("id = ?", id).First(&existingCategory).Error
+	var existingCategory *entities.Category
+	err := r.db.WithContext(ctx).Model(&entities.Category{}).Where("id = ?", id).First(&existingCategory).Error
 	if err != nil {
 		return ErrCategoryNotFound
 	}
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		err = tx.WithContext(ctx).Model(&category.Category{}).Where("id = ?", id).Delete(&existingCategory).Error
+		err = tx.WithContext(ctx).Model(&entities.Category{}).Where("id = ?", id).Delete(&existingCategory).Error
 		if err != nil {
 			return ErrDeletingCategory
 		}
