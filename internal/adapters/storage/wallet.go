@@ -103,6 +103,56 @@ func (w *walletRepo) TopUp(ctx context.Context, walletTopUp *wallet.WalletTopUp)
 	})
 }
 
+func (w *walletRepo) Withdraw(ctx context.Context, walletWithdraw *wallet.WalletWithdraw) error {
+	//check for card existence
+	var walletCard entities.WalletCard
+	if err := w.db.WithContext(ctx).Model(&entities.WalletCard{}).Where("id = ?", walletWithdraw.CardID).Find(&walletCard).Error; err != nil {
+		return err
+	}
+
+	if walletCard.ID == 0 {
+		return fmt.Errorf("card not found")
+	}
+
+	//fetch wallet
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	walletEntity, walletFetchErr := w.GetUserActiveWallet(ctx, userID)
+	if walletFetchErr != nil {
+		return walletFetchErr
+	}
+
+	if walletEntity.ID != walletCard.WalletID {
+		return fmt.Errorf("card is not belongs to you")
+	}
+
+	//check for available credits
+	if walletWithdraw.Amount > walletEntity.Credit {
+		return fmt.Errorf("insufficient credits")
+	}
+
+	return w.db.Transaction(func(tx *gorm.DB) error {
+
+		//deduct from wallet
+		walletEntity.Credit -= walletWithdraw.Amount
+		if err := tx.Save(&walletEntity).Error; err != nil {
+			return err
+		}
+
+		//store transaction
+		transaction := entities.WalletTransaction{
+			WalletID: walletEntity.ID,
+			Type:     wallet.TRANSACTION_TYPE_WITHDRAW,
+			Status:   wallet.TRANSACTION_STATUS_DONE, // as we don't have real payment gateway
+			Amount:   walletWithdraw.Amount,
+		}
+		if err := tx.Save(&transaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (w *walletRepo) Expense(ctx context.Context, wallet *wallet.Wallet, amount float64) error {
 	//TODO implement me
 	panic("implement me")

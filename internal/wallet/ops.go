@@ -45,3 +45,7 @@ func (o *Ops) CreateWalletCard(ctx context.Context, card *WalletCard) error {
 func (o *Ops) DeleteWalletCard(ctx context.Context, card *WalletCard) error {
 	return o.repo.DeleteWalletCard(ctx, card)
 }
+
+func (o *Ops) Withdraw(ctx context.Context, w *WalletWithdraw) error {
+	return o.repo.Withdraw(ctx, w)
+}

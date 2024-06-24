@@ -32,6 +32,12 @@ type WalletTransaction struct {
 	Additional map[string]interface{}
 }
 
+type WalletWithdraw struct {
+	CardID uint
+	Amount float64
+	Status uint
+}
+
 const (
 	TRANSACTION_TYPE_TOPUP uint = iota + 1
 	TRANSACTION_TYPE_EXPENSE
@@ -56,4 +62,5 @@ type Repo interface {
 
 	StoreWalletCard(ctx context.Context, card *WalletCard) error
 	DeleteWalletCard(ctx context.Context, card *WalletCard) error
+	Withdraw(ctx context.Context, w *WalletWithdraw) error
 }

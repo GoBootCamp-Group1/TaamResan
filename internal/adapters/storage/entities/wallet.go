@@ -34,3 +34,13 @@ type WalletTransaction struct {
 	Amount     float64
 	Additional map[string]interface{} `gorm:"serializer:json"`
 }
+
+type WalletWithdraw struct {
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Card      WalletCard
+	CardID    uint
+	Status    uint
+	Amount    float64
+}

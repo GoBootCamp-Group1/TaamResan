@@ -28,4 +28,10 @@ func InitWalletRoutes(router *tcp_http_server.Router, app *service.AppContainer,
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
+
+	router.HandleFunc("POST /wallet/withdraw", tcp_http_server.HandlerChain(
+		wallet.Withdraw(app),
+		middlewares.LoggingMiddleware(app.ActionLogService()),
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
 }
