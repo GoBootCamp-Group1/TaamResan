@@ -71,10 +71,20 @@ func (s *WalletService) TopUp(ctx context.Context, w *wallet.WalletTopUp) error 
 	return nil
 }
 
+func (s *WalletService) Withdraw(ctx context.Context, w *wallet.WalletWithdraw) error {
+	err := s.walletOps.Withdraw(ctx, w)
+	if err != nil {
+		return fmt.Errorf(ErrCreatingWalletWithdraw.Error()+": %w", err)
+	}
+
+	return nil
+}
+
 var (
-	ErrFetchingWallet      = errors.New("can not fetch wallet")
-	ErrCreatingWallet      = errors.New("can not create wallet")
-	ErrUpdatingWallet      = errors.New("can not update wallet")
-	ErrDeletingWallet      = errors.New("can not delete wallet")
-	ErrCreatingWalletTopUp = errors.New("can not top-up wallet")
+	ErrFetchingWallet         = errors.New("can not fetch wallet")
+	ErrCreatingWallet         = errors.New("can not create wallet")
+	ErrUpdatingWallet         = errors.New("can not update wallet")
+	ErrDeletingWallet         = errors.New("can not delete wallet")
+	ErrCreatingWalletTopUp    = errors.New("can not top-up wallet")
+	ErrCreatingWalletWithdraw = errors.New("can not withdraw wallet")
 )
