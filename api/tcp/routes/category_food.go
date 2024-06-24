@@ -11,31 +11,31 @@ import (
 func InitCategoryFoodRoutes(router *tcp_http_server.Router, app *service.AppContainer, cfg config.Server) {
 	router.HandleFunc("POST /category-foods", tcp_http_server.HandlerChain(
 		category_food_handlers.Create(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("DELETE /category-foods/:category_food_id", tcp_http_server.HandlerChain(
 		category_food_handlers.Delete(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("GET /category-foods/:category_food_id", tcp_http_server.HandlerChain(
 		category_food_handlers.Get(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("GET /foods/:food_id/category-foods", tcp_http_server.HandlerChain(
 		category_food_handlers.GetAllByFood(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
 	router.HandleFunc("GET /categories/:category_id/category-foods", tcp_http_server.HandlerChain(
 		category_food_handlers.GetAllByCategory(app),
-		middlewares.LoggingMiddleware,
+		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 }
