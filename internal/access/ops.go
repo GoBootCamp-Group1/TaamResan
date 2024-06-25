@@ -15,3 +15,7 @@ func NewOps(repo Repo) *Ops {
 func (o *Ops) CheckRestaurantOwner(ctx context.Context, userId uint, restaurantId uint) error {
 	return o.repo.CheckRestaurantOwner(ctx, userId, restaurantId)
 }
+
+func (o *Ops) CheckAdminAccess(ctx context.Context, userId uint) error {
+	return o.repo.CheckAdminAccess(ctx, userId)
+}

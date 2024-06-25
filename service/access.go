@@ -18,3 +18,7 @@ func NewAccessService(accessOps *access.Ops) *AccessService {
 func (s *AccessService) CheckRestaurantOwner(ctx context.Context, userId uint, restaurantId uint) error {
 	return s.accessOps.CheckRestaurantOwner(ctx, userId, restaurantId)
 }
+
+func (s *AccessService) CheckAdminAccess(ctx context.Context, userId uint) error {
+	return s.accessOps.CheckAdminAccess(ctx, userId)
+}
