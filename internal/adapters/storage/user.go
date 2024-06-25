@@ -56,6 +56,14 @@ func (r *userRepo) Create(ctx context.Context, user *user.User) error {
 			return err
 		}
 
+		// create cart
+		cartEntity := entities.Cart{
+			UserId: entity.ID,
+		}
+		if err = tx.WithContext(ctx).Model(&entities.Cart{}).Create(&cartEntity).Error; err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

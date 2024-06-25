@@ -2,10 +2,12 @@ package service
 
 import (
 	"TaamResan/cmd/api/config"
-	"TaamResan/internal/access"
 	"TaamResan/internal/action_log"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
+	"TaamResan/internal/block_restaurant"
+	"TaamResan/internal/cart"
+	"TaamResan/internal/cart_item"
 	"TaamResan/internal/category"
 	"TaamResan/internal/category_food"
 	"TaamResan/internal/food"
@@ -33,7 +35,9 @@ type AppContainer struct {
 	categoryService        *CategoryService
 	foodService            *FoodService
 	categoryFoodService    *CategoryFoodService
-	accessService          *AccessService
+	blockRestaurantService *BlockRestaurantService
+	cartService            *CartService
+	cartItemService        *CartItemService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -55,7 +59,9 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setCategoryService()
 	app.setFoodService()
 	app.setCategoryFoodService()
-	app.setAccessService()
+	app.setBlockRestaurantService()
+	app.setCartService()
+	app.setCartItemService()
 
 	return app, nil
 }
@@ -96,8 +102,16 @@ func (a *AppContainer) ActionLogService() *ActionLogService {
 	return a.actionLogService
 }
 
-func (a *AppContainer) AccessService() *AccessService {
-	return a.accessService
+func (a *AppContainer) BlockRestaurantService() *BlockRestaurantService {
+	return a.blockRestaurantService
+}
+
+func (a *AppContainer) CartService() *CartService {
+	return a.cartService
+}
+
+func (a *AppContainer) CartItemService() *CartItemService {
+	return a.cartItemService
 }
 
 func (a *AppContainer) setUserService() {
@@ -197,9 +211,25 @@ func (a *AppContainer) setCategoryFoodService() {
 	a.categoryFoodService = NewCategoryFoodService(category_food.NewOps(storage2.NewCategoryFoodRepo(a.dbConn)))
 }
 
-func (a *AppContainer) setAccessService() {
-	if a.accessService != nil {
+func (a *AppContainer) setBlockRestaurantService() {
+	if a.blockRestaurantService != nil {
 		return
 	}
-	a.accessService = NewAccessService(access.NewOps(storage2.NewAccessRepo(a.dbConn)))
+	a.blockRestaurantService = NewBlockRestaurantService(
+		block_restaurant.NewOps(storage2.NewBlockRestaurantRepo(a.dbConn)),
+		restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setCartService() {
+	if a.cartService != nil {
+		return
+	}
+	a.cartService = NewCartService(cart.NewOps(storage2.NewCartRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setCartItemService() {
+	if a.cartItemService != nil {
+		return
+	}
+	a.cartItemService = NewCartItemService(cart_item.NewOps(storage2.NewCartItemRepo(a.dbConn)))
 }
