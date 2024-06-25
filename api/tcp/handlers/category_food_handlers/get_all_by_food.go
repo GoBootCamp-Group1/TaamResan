@@ -16,7 +16,17 @@ func GetAllByFood(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
+		userId := request.GetUserID() // TODO: check permission
+		f, err := app.FoodService().GetById(request.Context(), uint(foodId))
+		if err != nil {
+			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
+			return
+		}
+		restaurantId := f.RestaurantId
+		if err = app.AccessService().CheckRestaurantOwner(request.Context(), userId, restaurantId); err != nil {
+			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
+			return
+		}
 
 		categoryFoodModels, err := app.CategoryFoodService().GetAllByFoodId(request.Context(), uint(foodId))
 		if err != nil {

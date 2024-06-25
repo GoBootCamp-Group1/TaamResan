@@ -9,25 +9,25 @@ import (
 )
 
 func InitRestaurantRoutes(router *tcp_http_server.Router, app *service.AppContainer, cfg config.Server) {
-	router.HandleFunc("POST /restaurant", tcp_http_server.HandlerChain(
+	router.HandleFunc("POST /restaurants", tcp_http_server.HandlerChain(
 		restaurant_handlers.CreateRestaurant(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("PUT /restaurant", tcp_http_server.HandlerChain(
+	router.HandleFunc("PUT /restaurants/:id", tcp_http_server.HandlerChain(
 		restaurant_handlers.UpdateRestaurant(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("DELETE /restaurant/:id", tcp_http_server.HandlerChain(
+	router.HandleFunc("DELETE /restaurants/:id", tcp_http_server.HandlerChain(
 		restaurant_handlers.DeleteRestaurant(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("GET /restaurant/:id", tcp_http_server.HandlerChain(
+	router.HandleFunc("GET /restaurants/:id", tcp_http_server.HandlerChain(
 		restaurant_handlers.GetRestaurant(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
@@ -39,13 +39,13 @@ func InitRestaurantRoutes(router *tcp_http_server.Router, app *service.AppContai
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("POST /restaurant/approve/:id", tcp_http_server.HandlerChain(
+	router.HandleFunc("POST /restaurants/approve/:id", tcp_http_server.HandlerChain(
 		restaurant_handlers.Approve(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
 
-	router.HandleFunc("POST /restaurant/delegate", tcp_http_server.HandlerChain(
+	router.HandleFunc("POST /restaurants/delegate", tcp_http_server.HandlerChain(
 		restaurant_handlers.Delegate(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),

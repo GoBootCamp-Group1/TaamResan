@@ -26,3 +26,7 @@ func (s *RestaurantStaffService) Delete(ctx context.Context, id uint) error {
 func (s *RestaurantStaffService) GetAllByRestaurantId(ctx context.Context, restaurantId uint) ([]*restaurant_staff.RestaurantStaff, error) {
 	return s.restaurantStaffOps.GetAllByRestaurantId(ctx, restaurantId)
 }
+
+func (s *RestaurantStaffService) GetById(ctx context.Context, id uint) (*restaurant_staff.RestaurantStaff, error) {
+	return s.restaurantStaffOps.GetById(ctx, id)
+}

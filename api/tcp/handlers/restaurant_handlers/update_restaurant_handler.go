@@ -20,6 +20,13 @@ type UpdateRequestBody struct {
 
 func UpdateRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
+		id, parseErr := strconv.ParseUint(request.UrlParams["id"], 10, 64)
+
+		if parseErr != nil {
+			tcp.RespondJsonError(conn, parseErr.Error(), tcp.NOT_FOUND)
+			return
+		}
+
 		var reqParams UpdateRequestBody
 
 		err := request.ExtractBodyParamsInto(&reqParams)
@@ -30,9 +37,14 @@ func UpdateRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateUpdateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
+		userId := request.GetUserID() // TODO: check permission
+		if err = app.AccessService().CheckRestaurantOwner(request.Context(), userId, uint(id)); err != nil {
+			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
+			return
+		}
 
 		newRestaurant := restaurant.Restaurant{
+			ID:      uint(id),
 			Name:    reqParams.Name,
 			OwnedBy: userId,
 			Address: address.Address{
