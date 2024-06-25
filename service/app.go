@@ -2,6 +2,7 @@ package service
 
 import (
 	"TaamResan/cmd/api/config"
+	"TaamResan/internal/access"
 	"TaamResan/internal/action_log"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
@@ -32,6 +33,7 @@ type AppContainer struct {
 	categoryService        *CategoryService
 	foodService            *FoodService
 	categoryFoodService    *CategoryFoodService
+	accessService          *AccessService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -53,6 +55,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setCategoryService()
 	app.setFoodService()
 	app.setCategoryFoodService()
+	app.setAccessService()
 
 	return app, nil
 }
@@ -91,6 +94,10 @@ func (a *AppContainer) RestaurantStaffService() *RestaurantStaffService {
 
 func (a *AppContainer) ActionLogService() *ActionLogService {
 	return a.actionLogService
+}
+
+func (a *AppContainer) AccessService() *AccessService {
+	return a.accessService
 }
 
 func (a *AppContainer) setUserService() {
@@ -188,4 +195,11 @@ func (a *AppContainer) setCategoryFoodService() {
 		return
 	}
 	a.categoryFoodService = NewCategoryFoodService(category_food.NewOps(storage2.NewCategoryFoodRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setAccessService() {
+	if a.accessService != nil {
+		return
+	}
+	a.accessService = NewAccessService(access.NewOps(storage2.NewAccessRepo(a.dbConn)))
 }
