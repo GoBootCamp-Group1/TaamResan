@@ -94,10 +94,9 @@ func (r *restaurantRepo) Create(ctx context.Context, restaurant *restaurant.Rest
 }
 
 func (r *restaurantRepo) Update(ctx context.Context, restaurant *restaurant.Restaurant) error {
-	// check restaurant existence, find by user and name
+	// check restaurant existence
 	var existingRestaurant entities.Restaurant
-	err := r.db.WithContext(ctx).Model(&entities.Restaurant{}).
-		Where("owned_by = ? and name = ?", restaurant.OwnedBy, restaurant.Name).
+	err := r.db.WithContext(ctx).Model(&entities.Restaurant{}).Where("id = ?", restaurant.ID).
 		First(&existingRestaurant).Error
 	if err != nil {
 		return ErrRestaurantNotFound
@@ -120,11 +119,16 @@ func (r *restaurantRepo) Update(ctx context.Context, restaurant *restaurant.Rest
 
 		epsilon := 1e-9
 		if math.Abs(restaurant.CourierSpeed-existingRestaurant.CourierSpeed) > epsilon {
-			// update restaurant
 			existingRestaurant.CourierSpeed = restaurant.CourierSpeed
-			if err = tx.WithContext(ctx).Model(&entities.Restaurant{}).Where("id = ?", existingRestaurant.ID).Save(&existingRestaurant).Error; err != nil {
-				return ErrUpdatingRestaurant
-			}
+		}
+
+		if restaurant.Name != existingRestaurant.Name {
+			existingRestaurant.Name = restaurant.Name
+		}
+
+		// update restaurant
+		if err = tx.WithContext(ctx).Model(&entities.Restaurant{}).Where("id = ?", existingRestaurant.ID).Save(&existingRestaurant).Error; err != nil {
+			return ErrUpdatingRestaurant
 		}
 
 		return nil

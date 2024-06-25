@@ -8,7 +8,7 @@ import (
 
 func GetAllRestaurants(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
-		//userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
+		//userId := request.GetUserID() // TODO: check permission and is Admin
 
 		restaurantModels, err := app.RestaurantService().GetAll(request.Context())
 		if err != nil {

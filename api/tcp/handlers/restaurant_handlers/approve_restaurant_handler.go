@@ -16,7 +16,7 @@ func Approve(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//userId := request.GetUserID() // TODO: check that user has permission and is Admin to do this
+		//userId := request.GetUserID() // TODO: check permission and is Admin
 
 		err := app.RestaurantService().Approve(request.Context(), uint(id))
 		if err != nil {
