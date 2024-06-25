@@ -6,6 +6,8 @@ import (
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
 	"TaamResan/internal/block_restaurant"
+	"TaamResan/internal/cart"
+	"TaamResan/internal/cart_item"
 	"TaamResan/internal/category"
 	"TaamResan/internal/category_food"
 	"TaamResan/internal/food"
@@ -34,6 +36,8 @@ type AppContainer struct {
 	foodService            *FoodService
 	categoryFoodService    *CategoryFoodService
 	blockRestaurantService *BlockRestaurantService
+	cartService            *CartService
+	cartItemService        *CartItemService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -56,6 +60,8 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setFoodService()
 	app.setCategoryFoodService()
 	app.setBlockRestaurantService()
+	app.setCartService()
+	app.setCartItemService()
 
 	return app, nil
 }
@@ -98,6 +104,14 @@ func (a *AppContainer) ActionLogService() *ActionLogService {
 
 func (a *AppContainer) BlockRestaurantService() *BlockRestaurantService {
 	return a.blockRestaurantService
+}
+
+func (a *AppContainer) CartService() *CartService {
+	return a.cartService
+}
+
+func (a *AppContainer) CartItemService() *CartItemService {
+	return a.cartItemService
 }
 
 func (a *AppContainer) setUserService() {
@@ -204,4 +218,18 @@ func (a *AppContainer) setBlockRestaurantService() {
 	a.blockRestaurantService = NewBlockRestaurantService(
 		block_restaurant.NewOps(storage2.NewBlockRestaurantRepo(a.dbConn)),
 		restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setCartService() {
+	if a.cartService != nil {
+		return
+	}
+	a.cartService = NewCartService(cart.NewOps(storage2.NewCartRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setCartItemService() {
+	if a.cartItemService != nil {
+		return
+	}
+	a.cartItemService = NewCartItemService(cart_item.NewOps(storage2.NewCartItemRepo(a.dbConn)))
 }
