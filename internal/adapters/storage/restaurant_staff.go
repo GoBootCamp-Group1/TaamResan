@@ -70,3 +70,12 @@ func (r *restaurantStaffRepo) GetAllByRestaurantId(ctx context.Context, restaura
 	}
 	return staffs, nil
 }
+
+func (r *restaurantStaffRepo) GetById(ctx context.Context, id uint) (*restaurant_staff.RestaurantStaff, error) {
+	var entity *entities.RestaurantStaff
+	if err := r.db.WithContext(ctx).Model(&entities.RestaurantStaff{}).Where("id = ?", id).First(&entity).Error; err != nil {
+		return nil, ErrRestaurantStaffNotFound
+	}
+
+	return mappers.RestaurantStaffEntityToDomain(entity), nil
+}

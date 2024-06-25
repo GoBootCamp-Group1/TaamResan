@@ -21,3 +21,7 @@ func (o *Ops) Delete(ctx context.Context, id uint) error {
 func (o *Ops) GetAllByRestaurantId(ctx context.Context, restaurantId uint) ([]*RestaurantStaff, error) {
 	return o.repo.GetAllByRestaurantId(ctx, restaurantId)
 }
+
+func (o *Ops) GetById(ctx context.Context, id uint) (*RestaurantStaff, error) {
+	return o.repo.GetById(ctx, id)
+}
