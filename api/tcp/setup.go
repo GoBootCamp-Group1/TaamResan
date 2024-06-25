@@ -86,4 +86,5 @@ func registerGlobalRoutes(router *tcp_http_server.Router, app *service.AppContai
 	routes.InitCategoryFoodRoutes(router, app, cfg)
 	routes.InitCartRoutes(router, app, cfg)
 	routes.InitCartItemRoutes(router, app, cfg)
+	routes.InitBlockRestaurantRoutes(router, app, cfg)
 }

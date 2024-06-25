@@ -8,6 +8,7 @@ import (
 	"TaamResan/internal/restaurant_staff"
 	"context"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 	"math"
 )
@@ -27,16 +28,15 @@ func NewRestaurantRepo(db *gorm.DB) restaurant.Repo {
 }
 
 var (
-	ErrCreatingAddr            = errors.New("error creating address")
-	ErrCreatingRestaurant      = errors.New("error creating restaurant")
-	ErrRestaurantExists        = errors.New("error restaurant already exists")
-	ErrRestaurantNotFound      = errors.New("error restaurant not found")
-	ErrAddrNotFound            = errors.New("error address not found")
-	ErrUpdatingRestaurant      = errors.New("error updating restaurant")
-	ErrUpdatingAddr            = errors.New("error updating address")
-	ErrDeletingRestaurant      = errors.New("error deleting restaurant")
-	ErrFetchingRestaurants     = errors.New("error fetching restaurant")
-	ErrUpdatingRestaurantStaff = errors.New("error updating restaurant staff")
+	ErrCreatingAddr        = errors.New("error creating address")
+	ErrCreatingRestaurant  = errors.New("error creating restaurant")
+	ErrRestaurantExists    = errors.New("error restaurant already exists")
+	ErrRestaurantNotFound  = errors.New("error restaurant not found")
+	ErrAddrNotFound        = errors.New("error address not found")
+	ErrUpdatingRestaurant  = errors.New("error updating restaurant")
+	ErrUpdatingAddr        = errors.New("error updating address")
+	ErrDeletingRestaurant  = errors.New("error deleting restaurant")
+	ErrFetchingRestaurants = errors.New("error fetching restaurant")
 )
 
 func (r *restaurantRepo) Create(ctx context.Context, restaurant *restaurant.Restaurant) (id uint, err error) {
@@ -65,7 +65,8 @@ func (r *restaurantRepo) Create(ctx context.Context, restaurant *restaurant.Rest
 		err = r.db.WithContext(ctx).Model(&entities.Restaurant{}).
 			Where("name = ? and address_id = ? and owned_by = ?", restaurant.Name, addrEntity.ID, restaurant.OwnedBy).
 			Find(&existingRestaurant).Error
-		if err == nil {
+		if existingRestaurant.ID != 0 {
+			fmt.Printf("--------- %+v", existingRestaurant)
 			return ErrRestaurantExists
 		}
 
@@ -77,14 +78,27 @@ func (r *restaurantRepo) Create(ctx context.Context, restaurant *restaurant.Rest
 		}
 		id = restaurantEntity.ID
 
+		// check restaurant staff existence
+		var existingRestaurantStaff *entities.RestaurantStaff
+		err = r.db.WithContext(ctx).Model(&entities.RestaurantStaff{}).
+			Where("restaurant_id = ? and user_id = ?", restaurantEntity.ID, restaurant.OwnedBy).First(&existingRestaurantStaff).Error
+		if err == nil {
+			return ErrRestaurantStaffExists
+		}
+
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrCreatingRestaurantStaff
+		}
+
 		// create restaurant staff
 		restaurantStaff := restaurant_staff.RestaurantStaff{
 			UserId:       restaurant.OwnedBy,
 			RestaurantId: restaurantEntity.ID,
 			Position:     restaurant_staff.Manager,
 		}
-
-		if _, err1 := r.staffRepo.Create(ctx, &restaurantStaff); err1 != nil {
+		entity := mappers.DomainToRestaurantStaffEntity(&restaurantStaff)
+		err = tx.WithContext(ctx).Model(&entities.RestaurantStaff{}).Create(&entity).Error
+		if err != nil {
 			return ErrCreatingRestaurantStaff
 		}
 
