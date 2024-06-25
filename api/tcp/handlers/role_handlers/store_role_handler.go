@@ -25,7 +25,11 @@ func CreateRole(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateCreateInputs(conn, reqParams)
 
-		//userId := request.GetUserID() // TODO: check that user has permission and is ADMIN to do this
+		userId := request.GetUserID() // TODO: check permission
+		if err = app.AccessService().CheckAdminAccess(request.Context(), userId); err != nil {
+			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
+			return
+		}
 
 		newRole := role.Role{
 			ID:   reqParams.ID,

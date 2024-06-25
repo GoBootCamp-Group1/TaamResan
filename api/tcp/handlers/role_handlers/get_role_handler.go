@@ -16,7 +16,11 @@ func GetRole(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//userId := request.GetUserID() // TODO: check that user has permission and is ADMIN to do this
+		userId := request.GetUserID() // TODO: check permission
+		if err := app.AccessService().CheckAdminAccess(request.Context(), userId); err != nil {
+			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
+			return
+		}
 
 		roleModel, err := app.RoleService().Get(request.Context(), uint(id))
 		if err != nil {
