@@ -72,6 +72,9 @@ func (r addressRepo) Create(ctx context.Context, address *address.Address) error
 }
 
 func (r addressRepo) Update(ctx context.Context, address *address.Address) error {
+	if err := r.checkUserAccess(ctx, address.ID); err != nil {
+		return err
+	}
 	addressEntity := mappers.DomainToAddressEntity(address)
 	//update address entity
 	return r.db.WithContext(ctx).Save(&addressEntity).Error
@@ -79,6 +82,10 @@ func (r addressRepo) Update(ctx context.Context, address *address.Address) error
 
 func (r addressRepo) Delete(ctx context.Context, address *address.Address) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := r.checkUserAccess(ctx, address.ID); err != nil {
+			return err
+		}
+
 		addressEntity := mappers.DomainToAddressEntity(address)
 
 		//get user id from context
@@ -104,6 +111,10 @@ func (r addressRepo) Delete(ctx context.Context, address *address.Address) error
 }
 
 func (r addressRepo) GetByID(ctx context.Context, id uint) (*address.Address, error) {
+	if err := r.checkUserAccess(ctx, id); err != nil {
+		return nil, err
+	}
+
 	var addressEntity entities.Address
 	err := r.db.WithContext(ctx).Model(&entities.Address{}).Where("id = ?", id).First(&addressEntity).Error
 	if err != nil {
@@ -116,13 +127,24 @@ func (r addressRepo) GetByID(ctx context.Context, id uint) (*address.Address, er
 }
 
 func (r addressRepo) GetAll(ctx context.Context) ([]*address.Address, error) {
-	//TODO: JOIN and check for relation for current user!
-	////get user id from context
-	//userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	var addressEntities []*address.Address
-	err := r.db.WithContext(ctx).Model(&address.Address{}).Find(&addressEntities).Error
+	err := r.db.WithContext(ctx).Model(&address.Address{}).Debug().
+		Joins("join user_addresses on user_addresses.address_id = addresses.id and user_addresses.user_id = ?", userID).
+		Find(&addressEntities).Error
 	if err != nil {
 		return nil, err
 	}
 	return addressEntities, nil
+}
+
+func (r addressRepo) checkUserAccess(ctx context.Context, addressId uint) error {
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	var userAddress *entities.UserAddress
+	if err := r.db.WithContext(ctx).Model(&entities.UserAddress{}).
+		Where("id = ? and user_id = ?", addressId, userID).First(&userAddress).Error; err != nil {
+		return ErrNotAllowed
+	}
+
+	return nil
 }
