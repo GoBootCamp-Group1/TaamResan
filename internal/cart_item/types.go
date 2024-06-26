@@ -1,6 +1,7 @@
 package cart_item
 
 import (
+	"TaamResan/internal/food"
 	"context"
 )
 
@@ -15,6 +16,7 @@ type CartItem struct {
 	ID     uint
 	CartId uint
 	FoodId uint
-	Amount uint
+	Amount float64
 	Note   string
+	Food   *food.Food
 }

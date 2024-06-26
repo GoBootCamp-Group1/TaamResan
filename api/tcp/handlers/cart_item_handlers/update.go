@@ -10,8 +10,8 @@ import (
 )
 
 type UpdateRequestBody struct {
-	Amount uint   `json:"amount"`
-	Note   string `json:"note"`
+	Amount float64 `json:"amount"`
+	Note   string  `json:"note"`
 }
 
 func Update(app *service.AppContainer) tcp.HandlerFunc {

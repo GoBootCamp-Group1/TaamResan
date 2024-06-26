@@ -21,6 +21,16 @@ func NewWalletRepo(db *gorm.DB) wallet.Repo {
 	}
 }
 
+func (w *walletRepo) GetWalletByUserId(ctx context.Context, userId uint) (*wallet.Wallet, error) {
+
+	var walletEntity *entities.Wallet
+	if err := w.db.WithContext(ctx).Model(&entities.Wallet{}).Where("user_id = ?", userId).Find(&walletEntity).Error; err != nil {
+		return nil, err
+	}
+
+	return mappers.WalletEntityToDomain(walletEntity), nil
+}
+
 func (w *walletRepo) Create(ctx context.Context) error {
 
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
@@ -153,9 +163,30 @@ func (w *walletRepo) Withdraw(ctx context.Context, walletWithdraw *wallet.Wallet
 	})
 }
 
-func (w *walletRepo) Expense(ctx context.Context, wallet *wallet.Wallet, amount float64) error {
-	//TODO implement me
-	panic("implement me")
+func (w *walletRepo) Expense(ctx context.Context, targetWallet *wallet.Wallet, amount float64) error {
+	walletEntity := mappers.DomainToWalletEntity(targetWallet)
+
+	return w.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+
+		//deduct from wallet
+		walletEntity.Credit -= amount
+		if err := tx.Save(&walletEntity).Error; err != nil {
+			return err
+		}
+
+		//store transaction
+		transaction := entities.WalletTransaction{
+			WalletID: walletEntity.ID,
+			Type:     wallet.TRANSACTION_TYPE_EXPENSE,
+			Status:   wallet.TRANSACTION_STATUS_DONE,
+			Amount:   amount,
+		}
+		if err := tx.Save(&transaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (w *walletRepo) GetUserActiveWallet(ctx context.Context, userId uint) (entities.Wallet, error) {

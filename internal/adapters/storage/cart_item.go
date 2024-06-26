@@ -3,10 +3,11 @@ package storage
 import (
 	"TaamResan/internal/adapters/storage/entities"
 	"TaamResan/internal/adapters/storage/mappers"
-	"TaamResan/internal/cart"
 	"TaamResan/internal/cart_item"
+	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -29,6 +30,44 @@ var (
 
 func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem) (id uint, err error) {
 	err = r.db.Transaction(func(tx *gorm.DB) error {
+		//get user id
+		userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+
+		//get food restaurantId
+		var restaurantId uint
+		r.db.Raw("SELECT restaurant_id FROM foods WHERE id = ?", cartItem.FoodId).Scan(&restaurantId)
+
+		//check if we have cart for this restaurant
+		var cartEntity *entities.Cart
+		if err = tx.WithContext(ctx).Model(&entities.Cart{}).Debug().
+			Preload("Items").
+			Where("user_id = ?", userID).
+			Where("restaurant_id = ?", restaurantId).
+			Find(&cartEntity).Error; err != nil {
+			return err
+		}
+
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// If the error is not record not found
+				//there is no cart for this restaurant, create one
+				cartEntity = &entities.Cart{
+					UserId:       userID,
+					RestaurantId: restaurantId,
+				}
+				if err = tx.WithContext(ctx).Model(&entities.Cart{}).Create(&cartEntity).Error; err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
+		}
+
+		//store cart item
+		cartItem.CartId = cartEntity.ID
+
+		fmt.Println("cartItem", cartItem)
+
 		var entity *entities.CartItem
 		if err = tx.WithContext(ctx).Model(&entities.CartItem{}).
 			Where("cart_id = ? and food_id = ?", cartItem.CartId, cartItem.FoodId).
@@ -40,27 +79,15 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 			return ErrCreatingCartItem
 		}
 
+		fmt.Println("before mapper")
 		entity = mappers.DomainToCartItemEntity(cartItem)
+		fmt.Println("after mapper")
+
 		if err = tx.WithContext(ctx).Model(&entities.CartItem{}).Create(&entity).Error; err != nil {
 			return ErrCreatingCartItem
 		}
-		id = entity.ID
 
-		// update cart's restaurantId if is nil
-		var cartEntity *cart.Cart
-		if err = tx.WithContext(ctx).Model(&entities.Cart{}).Debug().Where("id = ?", cartItem.CartId).Find(&cartEntity).Error; err != nil {
-			return err
-		}
-		if cartEntity.RestaurantId == nil {
-			var foodEntity *entities.Food
-			if err = tx.WithContext(ctx).Model(&entities.Food{}).Where("id = ?", cartItem.FoodId).Find(&foodEntity).Error; err != nil {
-				return err
-			}
-			cartEntity.RestaurantId = &foodEntity.RestaurantId
-			if err = tx.WithContext(ctx).Model(&entities.Cart{}).Debug().Where("id = ?", cartItem.CartId).Save(&cartEntity).Error; err != nil {
-				return err
-			}
-		}
+		id = entity.ID
 
 		return nil
 	})

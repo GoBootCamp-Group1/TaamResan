@@ -17,6 +17,7 @@ func CartItemEntityToDomain(entity *entities.CartItem) *cart_item.CartItem {
 }
 
 func DomainToCartItemEntity(model *cart_item.CartItem) *entities.CartItem {
+
 	return &entities.CartItem{
 		Model:  gorm.Model{ID: model.ID},
 		CartId: model.CartId,

@@ -8,6 +8,7 @@ import (
 func WalletEntityToDomain(entity *entities.Wallet) *wallet.Wallet {
 	return &wallet.Wallet{
 		ID:     entity.ID,
+		UserID: entity.UserID,
 		Credit: entity.Credit,
 	}
 }
@@ -15,6 +16,7 @@ func WalletEntityToDomain(entity *entities.Wallet) *wallet.Wallet {
 func DomainToWalletEntity(model *wallet.Wallet) *entities.Wallet {
 	return &entities.Wallet{
 		ID:     model.ID,
+		UserID: model.UserID,
 		Credit: model.Credit,
 	}
 }

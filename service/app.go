@@ -274,9 +274,10 @@ func (a *AppContainer) setOrderService() {
 		return
 	}
 
-	orderRepo := order.NewOps(storage2.NewOrderRepo(a.dbConn))
-	cartRepo := cart.NewOps(storage2.NewCartRepo(a.dbConn))
-	foodRepo := food.NewOps(storage2.NewFoodRepo(a.dbConn))
+	orderOps := order.NewOps(storage2.NewOrderRepo(a.dbConn))
+	cartOps := cart.NewOps(storage2.NewCartRepo(a.dbConn))
+	foodOps := food.NewOps(storage2.NewFoodRepo(a.dbConn))
+	walletOps := wallet.NewOps(storage2.NewWalletRepo(a.dbConn))
 
-	a.orderService = NewOrderService(orderRepo, cartRepo, foodRepo)
+	a.orderService = NewOrderService(orderOps, cartOps, foodOps, walletOps)
 }

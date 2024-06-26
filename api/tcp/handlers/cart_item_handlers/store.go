@@ -9,10 +9,9 @@ import (
 )
 
 type CreateRequestBody struct {
-	CartId uint   `json:"cart_id"`
-	FoodId uint   `json:"food_id"`
-	Amount uint   `json:"amount"`
-	Note   string `json:"note"`
+	FoodId uint    `json:"food_id"`
+	Amount float64 `json:"amount"`
+	Note   string  `json:"note"`
 }
 
 func Create(app *service.AppContainer) tcp.HandlerFunc {
@@ -30,7 +29,6 @@ func Create(app *service.AppContainer) tcp.HandlerFunc {
 		//userId := request.GetUserID() // TODO: permission and User
 
 		newCartItem := cart_item.CartItem{
-			CartId: reqParams.CartId,
 			FoodId: reqParams.FoodId,
 			Amount: reqParams.Amount,
 			Note:   reqParams.Note,
@@ -56,10 +54,6 @@ func validateCreateInputs(conn net.Conn, reqParams CreateRequestBody) {
 
 	noteValidator := validator.Validate(reqParams.Note).MinLength(3)
 	errors = append(errors, noteValidator.Errors()...)
-
-	if reqParams.CartId <= 0 {
-		errors = append(errors, "CartId must be greater than 0")
-	}
 
 	if reqParams.FoodId <= 0 {
 		errors = append(errors, "FoodId must be greater than 0")

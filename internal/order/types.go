@@ -2,6 +2,8 @@ package order
 
 import (
 	"TaamResan/internal/address"
+	"TaamResan/internal/cart"
+	"TaamResan/internal/cart_item"
 	"TaamResan/internal/restaurant"
 	"TaamResan/internal/user"
 	"context"
@@ -26,6 +28,7 @@ type Order struct {
 type InputData struct {
 	CartID    uint
 	AddressID uint
+	Note      *string
 }
 
 const (
@@ -42,5 +45,6 @@ const (
 )
 
 type Repo interface {
-	Create(ctx context.Context, data *InputData) (*Order, error)
+	Create(ctx context.Context, data *InputData, cartModel *cart.Cart) (*Order, error)
+	AddCartItemToOrder(ctx context.Context, order *Order, item *cart_item.CartItem) error
 }
