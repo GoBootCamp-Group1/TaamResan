@@ -6,4 +6,5 @@ type Cart struct {
 	gorm.Model
 	UserId       uint
 	RestaurantId *uint
+	Items        []*CartItem
 }

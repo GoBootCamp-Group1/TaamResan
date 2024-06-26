@@ -18,5 +18,5 @@ func (o orderRepo) Create(ctx context.Context, data *order.InputData) (*order.Or
 	fmt.Println("data inside repo: ", data)
 
 	//TODO implement me
-	panic("implement me")
+	return nil, nil
 }

@@ -47,9 +47,10 @@ func (r *cartRepo) Delete(ctx context.Context, id uint) error {
 
 func (r *cartRepo) GetByUserId(ctx context.Context, userId uint) (*cart.Cart, error) {
 	var cartEntity *entities.Cart
-	if err := r.db.WithContext(ctx).Model(&entities.Cart{}).Where("user_id = ?", userId).Find(&cartEntity).Error; err != nil {
+	if err := r.db.Debug().WithContext(ctx).Model(&entities.Cart{}).
+		Preload("Items").
+		Where("user_id = ?", userId).Find(&cartEntity).Error; err != nil {
 		return nil, ErrCartNotFound
 	}
-
 	return mappers.CartEntityToDomain(cartEntity), nil
 }

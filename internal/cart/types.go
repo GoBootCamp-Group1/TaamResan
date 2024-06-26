@@ -1,6 +1,9 @@
 package cart
 
-import "context"
+import (
+	"TaamResan/internal/cart_item"
+	"context"
+)
 
 type Repo interface {
 	Delete(ctx context.Context, id uint) error
@@ -11,4 +14,5 @@ type Cart struct {
 	ID           uint
 	UserId       uint
 	RestaurantId *uint
+	Items        []*cart_item.CartItem
 }
