@@ -24,6 +24,13 @@ func Run(cfg config.Server, app *service.AppContainer) {
 		}
 	}
 
+	// create admin
+	if err := app.UserService().CreateAdmin(context.Background()); err != nil {
+		if !errors.Is(err, storage.ErrRoleExists) {
+			log.Fatalf("Error creating admin: %v", err)
+		}
+	}
+
 	// Define listener
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Host, cfg.HttpPort))
 	if err != nil {
