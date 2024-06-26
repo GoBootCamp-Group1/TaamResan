@@ -12,6 +12,7 @@ import (
 	"TaamResan/internal/category"
 	"TaamResan/internal/category_food"
 	"TaamResan/internal/food"
+	"TaamResan/internal/order"
 	"TaamResan/internal/restaurant"
 	"TaamResan/internal/restaurant_staff"
 	"TaamResan/internal/role"
@@ -41,6 +42,7 @@ type AppContainer struct {
 	cartItemService        *CartItemService
 	accessService          *AccessService
 	searchService          *SearchService
+	orderService           *OrderService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -67,6 +69,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setCartItemService()
 	app.setAccessService()
 	app.setSearchService()
+	app.setOrderService()
 
 	return app, nil
 }
@@ -260,4 +263,20 @@ func (a *AppContainer) setSearchService() {
 	}
 
 	a.searchService = NewSearchService(restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)), food.NewOps(storage2.NewFoodRepo(a.dbConn)))
+}
+
+func (a *AppContainer) OrderService() *OrderService {
+	return a.orderService
+}
+
+func (a *AppContainer) setOrderService() {
+	if a.orderService != nil {
+		return
+	}
+
+	orderRepo := order.NewOps(storage2.NewOrderRepo(a.dbConn))
+	cartRepo := cart.NewOps(storage2.NewCartRepo(a.dbConn))
+	foodRepo := food.NewOps(storage2.NewFoodRepo(a.dbConn))
+
+	a.orderService = NewOrderService(orderRepo, cartRepo, foodRepo)
 }
