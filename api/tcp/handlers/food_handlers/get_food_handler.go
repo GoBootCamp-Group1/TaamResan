@@ -25,7 +25,7 @@ func Get(app *service.AppContainer) tcp.HandlerFunc {
 		}
 
 		restaurantId := food.RestaurantId
-		if err = app.AccessService().CheckRestaurantOwner(request.Context(), userId, restaurantId); err != nil {
+		if err = app.AccessService().CheckRestaurantStaff(request.Context(), userId, restaurantId); err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
 			return
 		}
