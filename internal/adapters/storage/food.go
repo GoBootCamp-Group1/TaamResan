@@ -5,6 +5,7 @@ import (
 	"TaamResan/internal/adapters/storage/mappers"
 	"TaamResan/internal/category_food"
 	"TaamResan/internal/food"
+	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
 	"gorm.io/gorm"
@@ -168,10 +169,17 @@ func (r *foodRepo) SearchFoods(ctx context.Context, searchData *food.FoodSearch)
 		query = query.Where("categories.id = ?", *searchData.CategoryID)
 	}
 
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	blockedRestaurantSubQuery := r.db.Model(&entities.BlockRestaurant{}).
+		Select("block_restaurants.id").
+		Where("block_restaurants.user_id = ?", userID)
+
+	query = query.Not("foods.restaurant_id IN (?)", blockedRestaurantSubQuery)
+
 	if searchData.Lat != nil && searchData.Lng != nil {
 		//TODO: using database related method, for range of 5000 meters in radius
 		query = query.Joins("JOIN restaurants ON restaurants.id = foods.restaurant_id").
-			Where("ST_DistanceSphere(ST_MakePoint(restaurants.lng, restaurants.lat), ST_MakePoint(?, ?)) < ?", searchData.Lng, searchData.Lat, 5000)
+			Where("ST_DistanceSphere(ST_MakePoint(restaurants.lng, restaurants.lat), ST_MakePoint(?, ?)) < ? ", searchData.Lng, searchData.Lat, 5000)
 	}
 
 	err := query.Find(&foods).Error
