@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	log2 "log"
 	"net"
 	"os"
 	"strings"
@@ -88,7 +88,7 @@ func writeLogToFile(request *tcp.Request) {
 
 	multiWriter := io.MultiWriter(os.Stdout, logFile)
 
-	logger := log.New(multiWriter, "Logger: ", log.LstdFlags)
+	logger := log2.New(multiWriter, "Logger: ", log2.LstdFlags)
 
 	logger.Printf("Received %s request for %s", request.Method, request.Uri)
 
