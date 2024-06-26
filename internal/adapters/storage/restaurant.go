@@ -6,6 +6,7 @@ import (
 	"TaamResan/internal/address"
 	"TaamResan/internal/restaurant"
 	"TaamResan/internal/restaurant_staff"
+	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
 	"fmt"
@@ -309,6 +310,13 @@ func (r *restaurantRepo) SearchRestaurants(ctx context.Context, searchData *rest
 	if searchData.CategoryID != nil {
 		query = query.Where("categories.id = ?", *searchData.CategoryID)
 	}
+
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	blockedRestaurantSubQuery := r.db.Model(&entities.BlockRestaurant{}).
+		Select("block_restaurants.id").
+		Where("block_restaurants.user_id = ?", userID)
+
+	query = query.Not("restaurants.id IN (?)", blockedRestaurantSubQuery)
 
 	if searchData.Lat != nil && searchData.Lng != nil {
 		query = query.Where("ST_DistanceSphere(ST_MakePoint(restaurants.lng, restaurants.lat), ST_MakePoint(?, ?)) < ?", *searchData.Lng, *searchData.Lat, 5000)

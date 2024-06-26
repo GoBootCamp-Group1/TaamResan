@@ -16,6 +16,10 @@ func (o *Ops) CheckRestaurantOwner(ctx context.Context, userId uint, restaurantI
 	return o.repo.CheckRestaurantOwner(ctx, userId, restaurantId)
 }
 
+func (o *Ops) CheckRestaurantStaff(ctx context.Context, userId uint, restaurantId uint) error {
+	return o.repo.CheckRestaurantStaff(ctx, userId, restaurantId)
+}
+
 func (o *Ops) CheckAdminAccess(ctx context.Context, userId uint) error {
 	return o.repo.CheckAdminAccess(ctx, userId)
 }

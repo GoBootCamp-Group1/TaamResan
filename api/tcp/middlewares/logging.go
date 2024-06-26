@@ -9,7 +9,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	log2 "log"
 	"net"
+	"os"
 	"strings"
 )
 
@@ -38,7 +41,7 @@ func LoggingMiddleware(actionLogService *service.ActionLogService) tcp.Middlewar
 				fmt.Printf(errLog.Error() + "\n")
 			}
 
-			fmt.Printf("Logger: Received %s request for %s\n", request.Method, request.Uri)
+			writeLogToFile(request)
 
 			//set log to context
 			ctx := context.WithValue(request.Context(), action_log.LogCtxKey, log)
@@ -73,4 +76,20 @@ func getUserId(request *tcp.Request) *uint {
 	}
 
 	return &claims.UserID
+}
+
+func writeLogToFile(request *tcp.Request) {
+	logFile, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		fmt.Printf("Error opening log file: %v\n", err)
+		return
+	}
+	defer logFile.Close()
+
+	multiWriter := io.MultiWriter(os.Stdout, logFile)
+
+	logger := log2.New(multiWriter, "Logger: ", log2.LstdFlags)
+
+	logger.Printf("Received %s request for %s", request.Method, request.Uri)
+
 }

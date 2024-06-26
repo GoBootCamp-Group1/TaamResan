@@ -111,9 +111,9 @@ func (r addressRepo) Delete(ctx context.Context, address *address.Address) error
 }
 
 func (r addressRepo) GetByID(ctx context.Context, id uint) (*address.Address, error) {
-	if err := r.checkUserAccess(ctx, id); err != nil {
-		return nil, err
-	}
+	//if err := r.checkUserAccess(ctx, id); err != nil {
+	//	return nil, err
+	//}
 
 	var addressEntity entities.Address
 	err := r.db.WithContext(ctx).Model(&entities.Address{}).Where("id = ?", id).First(&addressEntity).Error
