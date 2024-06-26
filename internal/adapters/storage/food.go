@@ -150,3 +150,40 @@ func (r *foodRepo) GetAll(ctx context.Context, restaurantId uint) ([]*food.Food,
 	}
 	return models, nil
 }
+
+func (r *foodRepo) SearchFoods(ctx context.Context, searchData *food.FoodSearch) ([]*food.Food, error) {
+
+	var foods []*entities.Food
+	query := r.db.Debug().WithContext(ctx).Model(&entities.Food{}).
+		Preload("Categories").
+		Preload("Restaurant").
+		Joins("JOIN category_foods ON category_foods.food_id = foods.id").
+		Joins("JOIN categories ON categories.id = category_foods.category_id")
+
+	if searchData.Name != "" {
+		query = query.Where("foods.name LIKE ?", "%"+searchData.Name+"%")
+	}
+
+	if searchData.CategoryID != nil {
+		query = query.Where("categories.id = ?", *searchData.CategoryID)
+	}
+
+	if searchData.Lat != nil && searchData.Lng != nil {
+		//TODO: using database related method, for range of 5000 meters in radius
+		query = query.Joins("JOIN restaurants ON restaurants.id = foods.restaurant_id").
+			Where("ST_DistanceSphere(ST_MakePoint(restaurants.lng, restaurants.lat), ST_MakePoint(?, ?)) < ?", searchData.Lng, searchData.Lat, 5000)
+	}
+
+	err := query.Find(&foods).Error
+
+	if err != nil {
+		return nil, ErrFoodNotFound
+	}
+
+	var models []*food.Food
+	for _, f := range foods {
+		model := mappers.FoodEntityToDomain(f)
+		models = append(models, model)
+	}
+	return models, nil
+}

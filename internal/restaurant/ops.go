@@ -39,3 +39,7 @@ func (o *Ops) Approve(ctx context.Context, id uint) error {
 func (o *Ops) DelegateOwnership(ctx context.Context, id uint, newOwnerId uint) error {
 	return o.repo.DelegateOwnership(ctx, id, newOwnerId)
 }
+
+func (o *Ops) SearchRestaurants(ctx context.Context, searchData *RestaurantSearch) ([]*Restaurant, error) {
+	return o.repo.SearchRestaurants(ctx, searchData)
+}

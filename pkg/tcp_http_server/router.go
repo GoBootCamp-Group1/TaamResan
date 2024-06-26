@@ -128,8 +128,18 @@ func patternToRegex(pattern string) (*regexp.Regexp, []string) {
 		keys = append(keys, param[1:])
 		return `([^/]+)`
 	})
-	regexPattern += `$`
+	regexPattern += `(?:\?.*)?$` // Allow for query parameters in the URL
 	return regexp.MustCompile(regexPattern), keys
+
+	//var keys []string
+	//regexPattern := "^" + regexp.QuoteMeta(pattern)
+	//regexPattern = strings.ReplaceAll(regexPattern, `\\:`, `:`)
+	//regexPattern = regexp.MustCompile(`:[^/]+`).ReplaceAllStringFunc(regexPattern, func(param string) string {
+	//	keys = append(keys, param[1:])
+	//	return `([^/]+)`
+	//})
+	//regexPattern += `$`
+	//return regexp.MustCompile(regexPattern), keys
 }
 
 // Serve handles incoming connections and routes them to the appropriate handler.
