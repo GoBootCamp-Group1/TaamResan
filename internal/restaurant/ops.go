@@ -40,6 +40,6 @@ func (o *Ops) DelegateOwnership(ctx context.Context, id uint, newOwnerId uint) e
 	return o.repo.DelegateOwnership(ctx, id, newOwnerId)
 }
 
-func (o *Ops) SearchRestaurants(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*Restaurant, error) {
-	return o.repo.SearchRestaurants(ctx, name, id, lat, lng)
+func (o *Ops) SearchRestaurants(ctx context.Context, searchData *RestaurantSearch) ([]*Restaurant, error) {
+	return o.repo.SearchRestaurants(ctx, searchData)
 }

@@ -1,20 +1,14 @@
 package search
 
 import (
-	"TaamResan/internal/food"
+	"TaamResan/internal/restaurant"
 	tcp "TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
-	"encoding/json"
 	"net"
 	"strconv"
 )
 
-type searchResponse struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-}
-
-func SearchFood(app *service.AppContainer) tcp.HandlerFunc {
+func SearchRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
 
 		queryParams := request.QueryParams
@@ -58,35 +52,23 @@ func SearchFood(app *service.AppContainer) tcp.HandlerFunc {
 			}
 		}
 
-		searchData := food.FoodSearch{
+		searchData := restaurant.RestaurantSearch{
 			Name:       queryParams["name"],
 			CategoryID: categoryID,
 			Lat:        lat,
 			Lng:        lng,
 		}
 
-		foods, err := app.SearchService().SearchFoods(request.Context(), &searchData)
+		restaurants, err := app.SearchService().SearchRestaurants(request.Context(), &searchData)
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
 			return
 		}
 
 		responseBody := map[string]any{
-			"data": map[string]any{"foods": &foods},
-			//"data": map[string]any{"foods": getSearchResponse(conn, foods)},
+			"data": map[string]any{"restaurants": &restaurants},
 		}
 		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
-}
-
-func getSearchResponse(conn net.Conn, food []*food.Food) []searchResponse {
-	var result []searchResponse
-	marshalled, _ := json.Marshal(food)
-	if err := json.Unmarshal(marshalled, &result); err != nil {
-		tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-		return result
-	}
-
-	return result
 }

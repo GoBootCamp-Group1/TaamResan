@@ -12,9 +12,9 @@ type Repo interface {
 }
 
 type Category struct {
-	ID           uint
-	ParentId     *uint
-	RestaurantId uint
-	CreatedBy    uint
-	Name         string
+	ID           uint   `json:"id"`
+	ParentId     *uint  `json:"parent_id"`
+	RestaurantId uint   `json:"restaurant_id"`
+	CreatedBy    uint   `json:"created_by"`
+	Name         string `json:"name"`
 }

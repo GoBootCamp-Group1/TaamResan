@@ -300,7 +300,31 @@ func (r *restaurantRepo) DelegateOwnership(ctx context.Context, id uint, newOwne
 	})
 }
 
-func (r *restaurantRepo) SearchRestaurants(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*restaurant.Restaurant, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *restaurantRepo) SearchRestaurants(ctx context.Context, searchData *restaurant.RestaurantSearch) ([]*restaurant.Restaurant, error) {
+	var restaurantsEntities []*entities.Restaurant
+	query := r.db.Debug().Table("restaurants").Select("restaurants.*").
+		Joins("JOIN categories ON categories.restaurant_id = restaurants.id").
+		Where("restaurants.name LIKE ?", "%"+searchData.Name+"%")
+
+	if searchData.CategoryID != nil {
+		query = query.Where("categories.id = ?", *searchData.CategoryID)
+	}
+
+	if searchData.Lat != nil && searchData.Lng != nil {
+		query = query.Where("ST_DistanceSphere(ST_MakePoint(restaurants.lng, restaurants.lat), ST_MakePoint(?, ?)) < ?", *searchData.Lng, *searchData.Lat, 5000)
+	}
+
+	err := query.Find(&restaurantsEntities).Error
+
+	if err != nil {
+		return nil, ErrFetchingRestaurants
+	}
+
+	var restaurants []*restaurant.Restaurant
+	for _, res := range restaurantsEntities {
+		model := mappers.RestaurantEntityToDomain(res)
+		restaurants = append(restaurants, model)
+	}
+
+	return restaurants, nil
 }

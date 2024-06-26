@@ -2,11 +2,18 @@ package mappers
 
 import (
 	"TaamResan/internal/adapters/storage/entities"
+	"TaamResan/internal/category"
 	"TaamResan/internal/food"
 	"gorm.io/gorm"
 )
 
 func FoodEntityToDomain(entity *entities.Food) *food.Food {
+	var categories []*category.Category
+
+	for _, c := range entity.Categories {
+		categories = append(categories, CategoryEntityToDomain(c))
+	}
+
 	return &food.Food{
 		ID:                 entity.ID,
 		RestaurantId:       entity.RestaurantId,
@@ -15,6 +22,8 @@ func FoodEntityToDomain(entity *entities.Food) *food.Food {
 		Price:              entity.Price,
 		CancelRate:         entity.CancelRate,
 		PreparationMinutes: entity.PreparationMinutes,
+		Restaurant:         RestaurantEntityToDomain(entity.Restaurant),
+		Categories:         categories,
 	}
 }
 

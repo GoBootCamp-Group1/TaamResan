@@ -18,10 +18,10 @@ func NewSearchService(restaurantRepo *restaurant.Ops, foodRepo *food.Ops) *Searc
 	}
 }
 
-func (s *SearchService) SearchRestaurants(ctx context.Context, name string, categoryID uint64, lat float64, lng float64) ([]*restaurant.Restaurant, error) {
-	return s.RestaurantRepo.SearchRestaurants(ctx, name, categoryID, lat, lng)
+func (s *SearchService) SearchRestaurants(ctx context.Context, searchData *restaurant.RestaurantSearch) ([]*restaurant.Restaurant, error) {
+	return s.RestaurantRepo.SearchRestaurants(ctx, searchData)
 }
 
-func (s *SearchService) SearchFoods(ctx context.Context, name string, categoryID uint64, lat float64, lng float64) ([]*food.Food, error) {
-	return s.FoodRepo.SearchFoods(ctx, name, categoryID, lat, lng)
+func (s *SearchService) SearchFoods(ctx context.Context, searchData *food.FoodSearch) ([]*food.Food, error) {
+	return s.FoodRepo.SearchFoods(ctx, searchData)
 }

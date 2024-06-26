@@ -10,4 +10,6 @@ type Food struct {
 	Price              float64
 	CancelRate         float64
 	PreparationMinutes uint
+	Restaurant         *Restaurant
+	Categories         []*Category `gorm:"many2many:category_foods;"`
 }
