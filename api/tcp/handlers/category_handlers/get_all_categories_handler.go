@@ -17,7 +17,7 @@ func GetAll(app *service.AppContainer) tcp.HandlerFunc {
 		}
 
 		userId := request.GetUserID() // TODO: check permission
-		if err := app.AccessService().CheckRestaurantOwner(request.Context(), userId, uint(restaurantId)); err != nil {
+		if err := app.AccessService().CheckRestaurantStaff(request.Context(), userId, uint(restaurantId)); err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
 			return
 		}

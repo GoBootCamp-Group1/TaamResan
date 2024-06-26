@@ -1,6 +1,9 @@
 package cart_item
 
-import "context"
+import (
+	"TaamResan/internal/food"
+	"context"
+)
 
 type Repo interface {
 	Create(ctx context.Context, cartItem *CartItem) (uint, error)
@@ -13,6 +16,7 @@ type CartItem struct {
 	ID     uint
 	CartId uint
 	FoodId uint
-	Amount uint
+	Amount float64
 	Note   string
+	Food   *food.Food
 }

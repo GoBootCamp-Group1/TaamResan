@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"unicode"
 )
 
 // Validator struct to hold value and errors.
@@ -69,25 +68,18 @@ func (v *Validator) Date() *Validator {
 }
 
 func (v *Validator) Password() *Validator {
-	if len(v.value) < 8 {
-		v.errors = append(v.errors, "password must be at least 8 characters long")
+	passwordLengthLimit := 8
+	if len(v.value) < passwordLengthLimit {
+		v.errors = append(v.errors, fmt.Sprintf("password must be at least %d characters long", passwordLengthLimit))
 	}
 
-	hasUpper := false
-	hasSpecial := false
-	for _, char := range v.value {
-		switch {
-		case unicode.IsUpper(char):
-			hasUpper = true
-		case unicode.IsPunct(char) || unicode.IsSymbol(char):
-			hasSpecial = true
-		}
-	}
+	upperCaseRegex := regexp.MustCompile(`[A-Z]`)
+	specialCharRegex := regexp.MustCompile(`[!@#$%^&*(),.?":{}|<>]`)
 
-	if !hasUpper {
+	if !upperCaseRegex.MatchString(v.value) {
 		v.errors = append(v.errors, "password must have at least one uppercase letter")
 	}
-	if !hasSpecial {
+	if !specialCharRegex.MatchString(v.value) {
 		v.errors = append(v.errors, "password must have at least one special character")
 	}
 

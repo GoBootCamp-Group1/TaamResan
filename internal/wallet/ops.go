@@ -49,3 +49,7 @@ func (o *Ops) DeleteWalletCard(ctx context.Context, card *WalletCard) error {
 func (o *Ops) Withdraw(ctx context.Context, w *WalletWithdraw) error {
 	return o.repo.Withdraw(ctx, w)
 }
+
+func (o *Ops) GetWalletByUserId(ctx context.Context, userId uint) (*Wallet, error) {
+	return o.repo.GetWalletByUserId(ctx, userId)
+}

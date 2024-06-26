@@ -17,3 +17,7 @@ func (o *Ops) Delete(ctx context.Context, id uint) error {
 func (o *Ops) GetByUserId(ctx context.Context, userId uint) (*Cart, error) {
 	return o.repo.GetByUserId(ctx, userId)
 }
+
+func (o *Ops) GetById(ctx context.Context, cartId uint) (*Cart, error) {
+	return o.repo.GetById(ctx, cartId)
+}

@@ -7,6 +7,7 @@ import (
 
 type Wallet struct {
 	ID     uint
+	UserID uint
 	Credit float64
 	User   user.User
 }
@@ -63,4 +64,5 @@ type Repo interface {
 	StoreWalletCard(ctx context.Context, card *WalletCard) error
 	DeleteWalletCard(ctx context.Context, card *WalletCard) error
 	Withdraw(ctx context.Context, w *WalletWithdraw) error
+	GetWalletByUserId(ctx context.Context, userId uint) (*Wallet, error)
 }
