@@ -1,8 +1,11 @@
 package restaurant_handlers
 
 import (
+	"TaamResan/internal/action_log"
 	tcp "TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
+	"encoding/json"
+	"fmt"
 	"net"
 	"strconv"
 )
@@ -28,10 +31,37 @@ func DeleteRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
+		if err = logDeleteRestaurantRequest(app, request, uint(id)); err != nil {
+			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
+			return
+		}
+
 		responseBody := map[string]any{
 			"message": "restaurant deleted successfully",
 		}
 		tcp.RespondJsonSuccess(conn, responseBody)
 		return
 	}
+}
+
+func logDeleteRestaurantRequest(app *service.AppContainer, request *tcp.Request, restaurantId uint) error {
+	userId := request.GetUserID()
+	var payload map[string]any
+	err := json.Unmarshal([]byte(request.Body), &payload)
+	if err != nil && request.Body != "" {
+		fmt.Printf(err.Error() + "\n")
+	}
+	log := action_log.ActionLog{
+		UserID:     &userId,
+		Action:     "Delete Restaurant",
+		IP:         request.IP,
+		Endpoint:   request.Uri,
+		Payload:    payload,
+		Method:     request.Method,
+		EntityType: action_log.RestaurantEntityType,
+		EntityID:   restaurantId,
+	}
+	_, err = app.ActionLogService().Create(request.Context(), &log)
+
+	return err
 }

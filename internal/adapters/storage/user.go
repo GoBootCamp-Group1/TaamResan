@@ -129,6 +129,11 @@ func (r *userRepo) CreateAdmin(ctx context.Context) error {
 			return err
 		}
 
+		ur := entities.UserRoles{UserId: entity.ID, RoleId: role.Admin}
+		if err := tx.WithContext(ctx).Model(&entities.UserRoles{}).Create(&ur).Error; err != nil {
+			return err
+		}
+
 		return nil
 	})
 }

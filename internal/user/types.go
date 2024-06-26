@@ -55,5 +55,5 @@ var DefaultAdminUser = User{
 	Email:     "admin@admin.com",
 	Mobile:    "091122233441",
 	BirthDate: time.Date(2000, 2, 2, 0, 0, 0, 0, &time.Location{}),
-	Password:  HashPassword("adminadmin"),
+	Password:  "Adminadmin1@",
 }
