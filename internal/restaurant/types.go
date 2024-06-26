@@ -13,6 +13,7 @@ type Repo interface {
 	GetAll(ctx context.Context) ([]*Restaurant, error)
 	Approve(ctx context.Context, id uint) error
 	DelegateOwnership(ctx context.Context, id uint, newOwnerId uint) error
+	SearchRestaurants(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*Restaurant, error)
 }
 
 type Restaurant struct {

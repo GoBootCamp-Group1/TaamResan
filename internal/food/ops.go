@@ -29,3 +29,7 @@ func (o *Ops) GetById(ctx context.Context, id uint) (*Food, error) {
 func (o *Ops) GetAll(ctx context.Context, restaurantId uint) ([]*Food, error) {
 	return o.repo.GetAll(ctx, restaurantId)
 }
+
+func (o *Ops) SearchFoods(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*Food, error) {
+	return o.repo.SearchFoods(ctx, name, id, lat, lng)
+}

@@ -150,3 +150,8 @@ func (r *foodRepo) GetAll(ctx context.Context, restaurantId uint) ([]*food.Food,
 	}
 	return models, nil
 }
+
+func (r *foodRepo) SearchFoods(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*food.Food, error) {
+	//TODO implement me
+	panic("implement me")
+}

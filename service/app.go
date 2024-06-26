@@ -38,6 +38,7 @@ type AppContainer struct {
 	blockRestaurantService *BlockRestaurantService
 	cartService            *CartService
 	cartItemService        *CartItemService
+	searchService          *SearchService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -62,6 +63,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setBlockRestaurantService()
 	app.setCartService()
 	app.setCartItemService()
+	app.setSearchService()
 
 	return app, nil
 }
@@ -112,6 +114,10 @@ func (a *AppContainer) CartService() *CartService {
 
 func (a *AppContainer) CartItemService() *CartItemService {
 	return a.cartItemService
+}
+
+func (a *AppContainer) SearchService() *SearchService {
+	return a.searchService
 }
 
 func (a *AppContainer) setUserService() {
@@ -232,4 +238,12 @@ func (a *AppContainer) setCartItemService() {
 		return
 	}
 	a.cartItemService = NewCartItemService(cart_item.NewOps(storage2.NewCartItemRepo(a.dbConn)))
+}
+
+func (a *AppContainer) setSearchService() {
+	if a.searchService != nil {
+		return
+	}
+
+	a.searchService = NewSearchService(restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)), food.NewOps(storage2.NewFoodRepo(a.dbConn)))
 }

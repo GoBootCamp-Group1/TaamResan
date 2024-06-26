@@ -11,6 +11,7 @@ type Repo interface {
 	Delete(ctx context.Context, id uint) error
 	GetById(ctx context.Context, id uint) (*Food, error)
 	GetAll(ctx context.Context, restaurantId uint) ([]*Food, error)
+	SearchFoods(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*Food, error)
 }
 
 type Food struct {

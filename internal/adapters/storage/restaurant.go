@@ -299,3 +299,8 @@ func (r *restaurantRepo) DelegateOwnership(ctx context.Context, id uint, newOwne
 		return nil
 	})
 }
+
+func (r *restaurantRepo) SearchRestaurants(ctx context.Context, name string, id uint64, lat float64, lng float64) ([]*restaurant.Restaurant, error) {
+	//TODO implement me
+	panic("implement me")
+}
