@@ -79,3 +79,15 @@ func (r *restaurantStaffRepo) GetById(ctx context.Context, id uint) (*restaurant
 
 	return mappers.RestaurantStaffEntityToDomain(entity), nil
 }
+
+func (r *restaurantStaffRepo) GetOwnerByRestaurantId(ctx context.Context, restaurantId uint) (*restaurant_staff.RestaurantStaff, error) {
+	var entity *entities.RestaurantStaff
+	if err := r.db.WithContext(ctx).Model(&entities.RestaurantStaff{}).
+		Where("restaurant_id = ?", restaurantId).
+		Where("position = ?", restaurant_staff.Manager).
+		First(&entity).Error; err != nil {
+		return nil, ErrRestaurantStaffNotFound
+	}
+
+	return mappers.RestaurantStaffEntityToDomain(entity), nil
+}

@@ -267,6 +267,7 @@ func (a *AppContainer) setOrderService() {
 	cartOps := cart.NewOps(storage2.NewCartRepo(a.dbConn))
 	foodOps := food.NewOps(storage2.NewFoodRepo(a.dbConn))
 	walletOps := wallet.NewOps(storage2.NewWalletRepo(a.dbConn))
+	restaurantStaffOps := restaurant_staff.NewOps(storage2.NewRestaurantStaffRepo(a.dbConn))
 
-	a.orderService = NewOrderService(orderOps, cartOps, foodOps, walletOps)
+	a.orderService = NewOrderService(orderOps, cartOps, foodOps, walletOps, restaurantStaffOps)
 }

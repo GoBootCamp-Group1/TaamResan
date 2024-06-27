@@ -5,6 +5,7 @@ import "context"
 type Repo interface {
 	Create(ctx context.Context, rStaff *RestaurantStaff) (uint, error)
 	Delete(ctx context.Context, id uint) error
+	GetOwnerByRestaurantId(ctx context.Context, restaurantId uint) (*RestaurantStaff, error)
 	GetAllByRestaurantId(ctx context.Context, restaurantId uint) ([]*RestaurantStaff, error)
 	GetById(ctx context.Context, id uint) (*RestaurantStaff, error)
 }

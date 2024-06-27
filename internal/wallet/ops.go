@@ -38,6 +38,10 @@ func (o *Ops) Refund(ctx context.Context, w *Wallet, amount float64) error {
 	return o.repo.Refund(ctx, w, amount)
 }
 
+func (o *Ops) Income(ctx context.Context, w *Wallet, amount float64) error {
+	return o.repo.Income(ctx, w, amount)
+}
+
 func (o *Ops) Expense(ctx context.Context, wallet *Wallet, amount float64) error {
 	return o.repo.Expense(ctx, wallet, amount)
 }
