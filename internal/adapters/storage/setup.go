@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"TaamResan/cmd/server/config"
+	"TaamResan/cmd/api/config"
 	"TaamResan/internal/adapters/storage/entities"
 	"fmt"
 

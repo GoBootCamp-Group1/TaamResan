@@ -3,6 +3,7 @@ package mappers
 import (
 	"TaamResan/internal/adapters/storage/entities"
 	"TaamResan/internal/user"
+	"gorm.io/gorm"
 )
 
 func UserEntityToDomain(entity *entities.User) *user.User {
@@ -13,6 +14,17 @@ func UserEntityToDomain(entity *entities.User) *user.User {
 		Mobile:    entity.Mobile,
 		BirthDate: entity.BirthDate,
 		Password:  entity.Password,
-		Roles:     []user.Role{user.Customer}, // TODO: fix this when Role entity is created
+	}
+}
+
+func DomainToUserEntity(model *user.User) *entities.User {
+	return &entities.User{
+		Model:     gorm.Model{ID: model.ID},
+		Uuid:      model.Uuid,
+		Name:      model.Name,
+		Email:     model.Email,
+		Mobile:    model.Mobile,
+		BirthDate: model.BirthDate,
+		Password:  user.HashPassword(model.Password),
 	}
 }

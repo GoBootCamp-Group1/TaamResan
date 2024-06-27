@@ -13,4 +13,5 @@ type User struct {
 	Mobile    string
 	BirthDate time.Time
 	Password  string
+	Addresses []*Address `gorm:"many2many:user_addresses;"`
 }
