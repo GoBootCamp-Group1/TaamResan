@@ -2,11 +2,17 @@ package mappers
 
 import (
 	"TaamResan/internal/adapters/storage/entities"
+	"TaamResan/internal/address"
 	"TaamResan/internal/order"
 	"gorm.io/gorm"
 )
 
 func OrderEntityToDomain(entity *entities.Order) *order.Order {
+	var addr *address.Address
+	if entity.Address != nil {
+		addr = AddressEntityToDomain(entity.Address)
+	}
+
 	return &order.Order{
 		ID:                 entity.ID,
 		RestaurantID:       entity.RestaurantID,
@@ -18,7 +24,7 @@ func OrderEntityToDomain(entity *entities.Order) *order.Order {
 		Note:               entity.Note,
 
 		Restaurant: RestaurantEntityToDomain(entity.Restaurant),
-		Address:    AddressEntityToDomain(entity.Address),
+		Address:    addr,
 	}
 }
 

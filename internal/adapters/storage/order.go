@@ -7,12 +7,17 @@ import (
 	"TaamResan/internal/cart_item"
 	"TaamResan/internal/order"
 	"context"
+	"errors"
 	"gorm.io/gorm"
 )
 
 type orderRepo struct {
 	db *gorm.DB
 }
+
+var (
+	ErrOrderNotFound = errors.New("error order not found")
+)
 
 func NewOrderRepo(db *gorm.DB) order.Repo { return &orderRepo{db: db} }
 
@@ -168,4 +173,24 @@ func (o *orderRepo) AddCartItemToOrder(ctx context.Context, order *order.Order, 
 
 		return nil
 	})
+}
+
+func (o *orderRepo) ChangeStatusByRestaurant(ctx context.Context, order *order.Order) error {
+	// check if order exists
+	var existingOrder *entities.Order
+	if err := o.db.WithContext(ctx).Model(&entities.Order{}).Where("id = ?", order.ID).Find(&existingOrder).Error; err != nil {
+		return err
+	}
+
+	if existingOrder.ID == 0 {
+		return ErrOrderNotFound
+	}
+
+	// save
+	existingOrder.Status = order.Status
+	if err := o.db.WithContext(ctx).Model(&entities.Order{}).Where("id = ?", order.ID).Save(&existingOrder).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
