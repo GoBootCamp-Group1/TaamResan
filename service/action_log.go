@@ -30,3 +30,11 @@ func (s *ActionLogService) Create(ctx context.Context, actionLog *action_log.Act
 
 	return log, nil
 }
+
+func (s *ActionLogService) GetAllByUserId(ctx context.Context, userId uint) ([]*action_log.ActionLog, error) {
+	return s.actionLogOps.GetAllByUserId(ctx, userId)
+}
+
+func (s *ActionLogService) GetAllByRestaurantId(ctx context.Context, restaurantId uint) ([]*action_log.ActionLog, error) {
+	return s.actionLogOps.GetAllByRestaurantId(ctx, restaurantId)
+}

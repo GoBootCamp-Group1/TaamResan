@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -16,6 +17,7 @@ type Repo interface {
 	GetByMobile(ctx context.Context, mobile string) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	//GetUserActiveWallet(ctx context.Context, userId uint) (*wallet.Wallet, error)
+	CreateAdmin(ctx context.Context) error
 }
 
 var (
@@ -45,4 +47,13 @@ func (u *User) PasswordIsValid(pass string) bool {
 	h.Write([]byte(pass))
 	passSha256 := h.Sum(nil)
 	return fmt.Sprintf("%x", passSha256) == u.Password
+}
+
+var DefaultAdminUser = User{
+	Uuid:      uuid.NewString(),
+	Name:      "admin",
+	Email:     "admin@admin.com",
+	Mobile:    "091122233441",
+	BirthDate: time.Date(2000, 2, 2, 0, 0, 0, 0, &time.Location{}),
+	Password:  "Adminadmin1@",
 }

@@ -72,3 +72,7 @@ func (s *UserService) UpdateUserProfile(ctx context.Context, u *user.User) error
 //
 //	return w, nil
 //}
+
+func (s *UserService) CreateAdmin(ctx context.Context) error {
+	return s.userOps.CreateAdmin(ctx)
+}

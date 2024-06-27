@@ -82,3 +82,7 @@ func (o *Ops) GetUserByEmailAndPassword(ctx context.Context, email, password str
 //
 //	return w, nil
 //}
+
+func (o *Ops) CreateAdmin(ctx context.Context) error {
+	return o.repo.CreateAdmin(ctx)
+}

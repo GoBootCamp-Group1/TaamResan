@@ -3,6 +3,7 @@ package storage
 import (
 	"TaamResan/internal/access"
 	"TaamResan/internal/adapters/storage/entities"
+	"TaamResan/internal/role"
 	"context"
 	"errors"
 	"gorm.io/gorm"
@@ -46,9 +47,13 @@ func (r *accessRepo) CheckRestaurantStaff(ctx context.Context, userId uint, rest
 }
 
 func (r *accessRepo) CheckAdminAccess(ctx context.Context, userId uint) error {
-	var entity *entities.User
-	err := r.db.WithContext(ctx).Model(&entities.User{}).Where("id = ?", userId).First(&entity).Error
+	var entity *entities.UserRoles
+	err := r.db.WithContext(ctx).Model(&entities.UserRoles{}).Where("user_id = ? and role_id = ?", userId, role.Admin).First(&entity).Error
 	if err != nil {
+		return ErrNotAllowed
+	}
+
+	if entity.ID == 0 {
 		return ErrNotAllowed
 	}
 

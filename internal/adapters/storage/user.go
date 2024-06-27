@@ -109,3 +109,31 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*user.User, er
 //	}
 //	return mappers.WalletEntityToDomain(&w), nil
 //}
+
+func (r *userRepo) CreateAdmin(ctx context.Context) error {
+	// check that if have user with admin role
+	var userRole *entities.UserRoles
+	if err := r.db.WithContext(ctx).Model(&entities.UserRoles{}).
+		Where("role_id = ?", role.Admin).Find(&userRole).Error; err != nil {
+		return err
+	}
+
+	if userRole.ID != 0 {
+		return nil // admin already created, do nothing
+	}
+
+	// if not, create one
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		entity := mappers.DomainToUserEntity(&user.DefaultAdminUser)
+		if err := tx.WithContext(ctx).Model(&entities.User{}).Create(entity).Error; err != nil {
+			return err
+		}
+
+		ur := entities.UserRoles{UserId: entity.ID, RoleId: role.Admin}
+		if err := tx.WithContext(ctx).Model(&entities.UserRoles{}).Create(&ur).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
