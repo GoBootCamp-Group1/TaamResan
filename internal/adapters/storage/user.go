@@ -137,3 +137,18 @@ func (r *userRepo) CreateAdmin(ctx context.Context) error {
 		return nil
 	})
 }
+
+func (r *userRepo) GetUserRoles(ctx context.Context, userId uint) ([]uint, error) {
+	var userRole []*entities.UserRoles
+	if err := r.db.WithContext(ctx).Model(&entities.UserRoles{}).
+		Where("user_id = ?", userId).Find(&userRole).Error; err != nil {
+		return nil, err
+	}
+
+	var roles []uint
+	for _, ro := range userRole {
+		roles = append(roles, ro.RoleId)
+	}
+
+	return roles, nil
+}

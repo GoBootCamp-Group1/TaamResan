@@ -18,6 +18,7 @@ type Repo interface {
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	//GetUserActiveWallet(ctx context.Context, userId uint) (*wallet.Wallet, error)
 	CreateAdmin(ctx context.Context) error
+	GetUserRoles(ctx context.Context, userId uint) ([]uint, error)
 }
 
 var (

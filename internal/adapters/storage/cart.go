@@ -47,7 +47,7 @@ func (r *cartRepo) Delete(ctx context.Context, id uint) error {
 
 func (r *cartRepo) GetByUserId(ctx context.Context, userId uint) (*cart.Cart, error) {
 	var cartEntity *entities.Cart
-	if err := r.db.Debug().WithContext(ctx).Model(&entities.Cart{}).
+	if err := r.db.WithContext(ctx).Model(&entities.Cart{}).
 		Preload("Items.Food").
 		Where("user_id = ?", userId).Find(&cartEntity).Error; err != nil {
 		return nil, ErrCartNotFound
@@ -57,7 +57,7 @@ func (r *cartRepo) GetByUserId(ctx context.Context, userId uint) (*cart.Cart, er
 
 func (r *cartRepo) GetById(ctx context.Context, cartId uint) (*cart.Cart, error) {
 	var cartEntity *entities.Cart
-	if err := r.db.Debug().WithContext(ctx).Model(&entities.Cart{}).
+	if err := r.db.WithContext(ctx).Model(&entities.Cart{}).
 		Preload("Items.Food").
 		Where("id = ?", cartId).Find(&cartEntity).Error; err != nil {
 		return nil, ErrCartNotFound

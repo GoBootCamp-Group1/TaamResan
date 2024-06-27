@@ -26,11 +26,7 @@ func Create(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateCreateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		if err = app.AccessService().CheckRestaurantStaff(request.Context(), userId, reqParams.RestaurantId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
+		userId := request.GetUserID()
 
 		newCategory := category.Category{
 			ParentId:     reqParams.ParentId,

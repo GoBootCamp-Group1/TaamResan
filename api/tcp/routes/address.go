@@ -4,6 +4,7 @@ import (
 	"TaamResan/api/tcp/handlers/address"
 	"TaamResan/api/tcp/middlewares"
 	"TaamResan/cmd/api/config"
+	"TaamResan/internal/role"
 	"TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
 )
@@ -13,29 +14,34 @@ func InitAddressRoutes(router *tcp_http_server.Router, app *service.AppContainer
 		address.StoreAddress(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ADDRESS, []uint{role.Customer, role.Admin, role.RestaurantOperator, role.RestaurantOwner}),
 	))
 
 	router.HandleFunc("PUT /addresses/:addressId", tcp_http_server.HandlerChain(
 		address.UpdateAddress(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ADDRESS, []uint{role.Customer, role.Admin, role.RestaurantOperator, role.RestaurantOwner}),
 	))
 
 	router.HandleFunc("GET /addresses", tcp_http_server.HandlerChain(
 		address.GetAllAddresses(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ADDRESS, []uint{role.Customer, role.Admin, role.RestaurantOperator, role.RestaurantOwner}),
 	))
 
 	router.HandleFunc("GET /addresses/:addressId", tcp_http_server.HandlerChain(
 		address.GetAddress(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ADDRESS, []uint{role.Customer, role.Admin, role.RestaurantOperator, role.RestaurantOwner}),
 	))
 
 	router.HandleFunc("DELETE /addresses/:addressId", tcp_http_server.HandlerChain(
 		address.DeleteAddress(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ADDRESS, []uint{role.Customer, role.Admin, role.RestaurantOperator, role.RestaurantOwner}),
 	))
 }

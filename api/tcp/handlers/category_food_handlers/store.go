@@ -24,18 +24,6 @@ func Create(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateCreateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		cat, err := app.CategoryService().GetById(request.Context(), reqParams.CategoryId)
-		if err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-			return
-		}
-		restaurantId := cat.RestaurantId
-		if err = app.AccessService().CheckRestaurantStaff(request.Context(), userId, restaurantId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
-
 		newCategoryFood := category_food.CategoryFood{
 			CategoryId: reqParams.CategoryId,
 			FoodId:     reqParams.FoodId,

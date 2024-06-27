@@ -22,7 +22,10 @@ func (s *RoleService) InitializeRoles(ctx context.Context) error {
 	}
 
 	for _, r := range roles {
-		return s.roleOps.Create(ctx, &r)
+		err := s.roleOps.Create(ctx, &r)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -30,11 +30,7 @@ func Create(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateCreateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		if err = app.AccessService().CheckRestaurantStaff(request.Context(), userId, reqParams.RestaurantId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
+		userId := request.GetUserID()
 
 		categories := make([]*category.Category, 0, len(reqParams.Categories))
 		if len(reqParams.Categories) > 0 {

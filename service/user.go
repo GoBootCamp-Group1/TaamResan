@@ -76,3 +76,7 @@ func (s *UserService) UpdateUserProfile(ctx context.Context, u *user.User) error
 func (s *UserService) CreateAdmin(ctx context.Context) error {
 	return s.userOps.CreateAdmin(ctx)
 }
+
+func (s *UserService) GetUserRoles(ctx context.Context, userId uint) ([]uint, error) {
+	return s.userOps.GetUserRoles(ctx, userId)
+}

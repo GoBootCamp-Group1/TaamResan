@@ -21,6 +21,10 @@ func NewAddressRepo(db *gorm.DB) address.Repo {
 	}
 }
 
+var (
+	ErrNotAllowed = errors.New("error not allowed")
+)
+
 func (r addressRepo) Create(ctx context.Context, address *address.Address) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 
@@ -72,9 +76,6 @@ func (r addressRepo) Create(ctx context.Context, address *address.Address) error
 }
 
 func (r addressRepo) Update(ctx context.Context, address *address.Address) error {
-	if err := r.checkUserAccess(ctx, address.ID); err != nil {
-		return err
-	}
 	addressEntity := mappers.DomainToAddressEntity(address)
 	//update address entity
 	return r.db.WithContext(ctx).Save(&addressEntity).Error
@@ -125,7 +126,7 @@ func (r addressRepo) GetByID(ctx context.Context, id uint) (*address.Address, er
 func (r addressRepo) GetAll(ctx context.Context) ([]*address.Address, error) {
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	var addressEntities []*address.Address
-	err := r.db.WithContext(ctx).Model(&address.Address{}).Debug().
+	err := r.db.WithContext(ctx).Model(&address.Address{}).
 		Joins("join user_addresses on user_addresses.address_id = addresses.id and user_addresses.user_id = ?", userID).
 		Find(&addressEntities).Error
 	if err != nil {
@@ -138,7 +139,7 @@ func (r addressRepo) checkUserAccess(ctx context.Context, addressId uint) error 
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	var userAddress *entities.UserAddress
 	if err := r.db.WithContext(ctx).Model(&entities.UserAddress{}).
-		Where("id = ? and user_id = ?", addressId, userID).First(&userAddress).Error; err != nil {
+		Where("address_id = ? and user_id = ?", addressId, userID).First(&userAddress).Error; err != nil {
 		return ErrNotAllowed
 	}
 

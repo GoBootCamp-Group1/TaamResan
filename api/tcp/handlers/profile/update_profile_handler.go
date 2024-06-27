@@ -29,8 +29,6 @@ func UpdateProfile(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateInputs(conn, reqParams)
 
-		//get authenticated user claims
-		//claims := request.GetClaims()
 		userId := request.GetUserID()
 
 		updatedUser := user.User{

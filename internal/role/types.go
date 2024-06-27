@@ -35,3 +35,22 @@ const (
 )
 
 var DefaultRole = Role{ID: Customer, Name: CUSTOMER}
+
+const (
+	LOG        = "log"
+	ROLE       = "manage role"
+	ADDRESS    = "manage address"
+	CART       = "add to cart"
+	ORDER      = "order"
+	WALLET     = "manage wallet"
+	RESTAURANT = "manage restaurant"
+	CATEGORY   = "manage category"
+	FOOD       = "manage food"
+)
+
+var RolePermissions = map[uint]([]string){
+	Customer:           {ADDRESS, CART, ORDER, WALLET},
+	Admin:              {LOG, ROLE, ADDRESS},
+	RestaurantOwner:    {RESTAURANT, CATEGORY, FOOD},
+	RestaurantOperator: {CATEGORY, FOOD},
+}

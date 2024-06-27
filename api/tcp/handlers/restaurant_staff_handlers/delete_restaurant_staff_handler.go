@@ -16,18 +16,7 @@ func Delete(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		userId := request.GetUserID() // TODO: check permission
-		rf, err := app.RestaurantStaffService().GetById(request.Context(), uint(id))
-		if err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-			return
-		}
-		if err = app.AccessService().CheckRestaurantOwner(request.Context(), userId, rf.RestaurantId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
-
-		err = app.RestaurantStaffService().Delete(request.Context(), uint(id))
+		err := app.RestaurantStaffService().Delete(request.Context(), uint(id))
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
 			return

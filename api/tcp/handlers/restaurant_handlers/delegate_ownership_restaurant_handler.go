@@ -23,12 +23,6 @@ func Delegate(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateApproveInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		if err = app.AccessService().CheckRestaurantOwner(request.Context(), userId, reqParams.RestaurantId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
-
 		err = app.RestaurantService().DelegateOwnership(request.Context(), reqParams.RestaurantId, reqParams.NewOwnerId)
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)

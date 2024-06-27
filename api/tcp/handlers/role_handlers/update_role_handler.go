@@ -25,12 +25,6 @@ func UpdateRole(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateUpdateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		if err = app.AccessService().CheckAdminAccess(request.Context(), userId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
-
 		newRole := role.Role{
 			ID:   reqParams.ID,
 			Name: reqParams.Name,

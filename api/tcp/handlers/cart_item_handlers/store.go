@@ -26,8 +26,6 @@ func Create(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateCreateInputs(conn, reqParams)
 
-		//userId := request.GetUserID() // TODO: permission and User
-
 		newCartItem := cart_item.CartItem{
 			FoodId: reqParams.FoodId,
 			Amount: reqParams.Amount,

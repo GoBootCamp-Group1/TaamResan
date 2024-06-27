@@ -35,8 +35,6 @@ func UpdateAddress(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//TODO: check for permission and ownership of resource
-
 		updatedAddress := address.Address{
 			ID:    uint(addressId),
 			Title: reqParams.Title,

@@ -27,9 +27,6 @@ func StoreAddress(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateInputs(conn, reqParams)
 
-		//get authenticated user claims
-		//userId := request.GetUserID()
-
 		newAddress := address.Address{
 			Title: reqParams.Title,
 			Lat:   reqParams.Lat,
