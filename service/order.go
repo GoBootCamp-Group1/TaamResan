@@ -34,65 +34,77 @@ var (
 
 func (s *OrderService) Create(ctx context.Context, data *order.InputData) (*order.Order, error) {
 	//TODO: begin transaction
-
 	//user id
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+
 	//get cart items
 	cartModel, err := s.cartOps.GetById(ctx, data.CartID)
 	if err != nil {
-		return nil, fmt.Errorf("can not fetch user cart")
+		return nil, fmt.Errorf("can not fetch user cart: %w", err)
 	}
 
-	//CONDITIONS
-	//check if cart has items -> TODO: extract
+	//check if cart has items
 	if len(cartModel.Items) == 0 {
 		return nil, ErrNoCartItem
 	}
 
 	//calculate total amount
-	totalAmount := cartModel.CalculateItemsAmount()
-
-	//TODO: check if foods price is equal to cart item price
-
-	//check if wallet has enough credit -> TODO: extract
-	userWallet, err := s.walletOps.GetWalletByUserId(ctx, userID)
-
+	totalAmount, err := s.cartOps.GetItemsFeeByID(ctx, cartModel.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can not calculate items fee: %w", err)
 	}
 
+	//check if wallet has enough credit
+	userWallet, err := s.walletOps.GetWalletByUserId(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("can not fetch user wallet: %w", err)
+	}
 	if userWallet.Credit < totalAmount {
 		return nil, ErrInsufficientCredits
 	}
-
 	//create an order
 	newOrder, err := s.orderOps.Create(ctx, data, cartModel)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can not create order: %w", err)
 	}
 
 	err = s.walletOps.Expense(ctx, userWallet, totalAmount)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can not expense money from user wallet: %w", err)
 	}
 
 	return newOrder, nil
 }
 
+func (s *OrderService) GetOrderInfo(ctx context.Context, o *order.Order) (*order.Order, error) {
+	fetchedOrder, err := s.orderOps.GetOrderByID(ctx, o.ID)
+	if err != nil {
+		return nil, fmt.Errorf("can not fetch order: %w", err)
+	}
+
+	//TODO: better to use a mutator
+	fetchedOrder.StatusTitle = fetchedOrder.MapStatusToStr()
+
+	return fetchedOrder, nil
+}
+
 func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*order.Order, float64, error) {
 	//TODO:start transaction
+
 	//check if order is already cancelled
 	orderInfo, err := s.orderOps.GetOrderByID(ctx, o.ID)
 	if orderInfo.Status == order.STATUS_CANCELLED_BY_CUSTOMER {
 		return nil, 0, fmt.Errorf("order is already cancelled by customer")
 	}
+
 	//update status of order
 	orderInfo.Status = order.STATUS_CANCELLED_BY_CUSTOMER
 	updatedOrder, err := s.orderOps.Update(ctx, orderInfo)
 	if err != nil {
 		return nil, 0, fmt.Errorf("can not update order: %w", err)
 	}
+
 	//calculate food cancellation price
 	cancellationAmount, err := s.orderOps.GetItemsCancellationFee(ctx, o)
 	if err != nil {
@@ -102,6 +114,7 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 	if err != nil {
 		return nil, 0, fmt.Errorf("can not get order items fee: %w", err)
 	}
+
 	//add to wallet
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	userWallet, err := s.walletOps.GetWalletByUserId(ctx, userID)
@@ -111,5 +124,6 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 		return nil, 0, fmt.Errorf("can not refund user wallet: %w", err)
 	}
 	//TODO:commit transaction
+
 	return updatedOrder, refundAmount, nil
 }

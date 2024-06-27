@@ -62,5 +62,24 @@ func (r *cartRepo) GetById(ctx context.Context, cartId uint) (*cart.Cart, error)
 		Where("id = ?", cartId).Find(&cartEntity).Error; err != nil {
 		return nil, ErrCartNotFound
 	}
+
 	return mappers.CartEntityToDomain(cartEntity), nil
+}
+
+func (r *cartRepo) GetItemsFeeByID(ctx context.Context, id uint) (float64, error) {
+	sql := `
+		SELECT SUM(f.price * ct.amount) AS "total_amount"
+		FROM carts c
+				 INNER JOIN cart_items ct ON c.id = ct.cart_id
+				 INNER JOIN foods f ON ct.food_id = f.id AND f.deleted_at IS NULL
+		WHERE c.id = ?
+		`
+	var amount float64
+	err := r.db.WithContext(ctx).Raw(sql, id).Scan(&amount).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return amount, nil
 }
