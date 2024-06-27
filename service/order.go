@@ -4,11 +4,13 @@ import (
 	"TaamResan/internal/cart"
 	"TaamResan/internal/food"
 	"TaamResan/internal/order"
+	"TaamResan/internal/restaurant_staff"
 	"TaamResan/internal/wallet"
 	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type OrderService struct {
@@ -85,6 +87,12 @@ func (s *OrderService) GetOrderInfo(ctx context.Context, o *order.Order) (*order
 		return nil, fmt.Errorf("can not fetch order: %w", err)
 	}
 
+	//check if order owner is logged-in user?
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	if fetchedOrder.UserID != userID {
+		return nil, fmt.Errorf("order is not belong to you")
+	}
+
 	//TODO: better to use a mutator
 	fetchedOrder.StatusTitle = fetchedOrder.MapStatusToStr()
 
@@ -98,6 +106,12 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 	orderInfo, err := s.orderOps.GetOrderByID(ctx, o.ID)
 	if orderInfo.Status == order.STATUS_CANCELLED_BY_CUSTOMER {
 		return nil, 0, fmt.Errorf("order is already cancelled by customer")
+	}
+
+	//check if order owner is logged-in user?
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	if orderInfo.UserID != userID {
+		return nil, 0, fmt.Errorf("order is not belong to you")
 	}
 
 	//update status of order
@@ -118,7 +132,6 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 	}
 
 	//add to wallet
-	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	userWallet, err := s.walletOps.GetWalletByUserId(ctx, userID)
 	refundAmount := totalAmount - cancellationAmount
 	err = s.walletOps.Refund(ctx, userWallet, refundAmount)
@@ -135,6 +148,12 @@ func (s *OrderService) ApproveByCustomer(ctx context.Context, o *order.Order) (*
 	orderInfo, err := s.orderOps.GetOrderByID(ctx, o.ID)
 	if !orderInfo.CustomerApprovedAt.IsZero() {
 		return nil, fmt.Errorf("order is already approved by customer")
+	}
+
+	//check if order owner is logged-in user?
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	if orderInfo.UserID != userID {
+		return nil, fmt.Errorf("order is not belong to you")
 	}
 
 	//update order

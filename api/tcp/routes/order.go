@@ -41,5 +41,6 @@ func InitOrderRoutes(router *tcp_http_server.Router, app *service.AppContainer, 
 		order.CustomerApproveHandler(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ORDER, []uint{role.Customer}),
 	))
 }
