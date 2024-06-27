@@ -21,3 +21,7 @@ func (o *Ops) GetByUserId(ctx context.Context, userId uint) (*Cart, error) {
 func (o *Ops) GetById(ctx context.Context, cartId uint) (*Cart, error) {
 	return o.repo.GetById(ctx, cartId)
 }
+
+func (o *Ops) GetItemsFeeByID(ctx context.Context, cartId uint) (float64, error) {
+	return o.repo.GetItemsFeeByID(ctx, cartId)
+}

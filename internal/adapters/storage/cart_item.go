@@ -7,7 +7,6 @@ import (
 	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -39,7 +38,7 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 
 		//check if we have cart for this restaurant
 		var cartEntity *entities.Cart
-		if err = tx.WithContext(ctx).Model(&entities.Cart{}).Debug().
+		if err = tx.WithContext(ctx).Model(&entities.Cart{}).
 			Preload("Items").
 			Where("user_id = ?", userID).
 			Where("restaurant_id = ?", restaurantId).
@@ -66,8 +65,6 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 		//store cart item
 		cartItem.CartId = cartEntity.ID
 
-		fmt.Println("cartItem", cartItem)
-
 		var entity *entities.CartItem
 		if err = tx.WithContext(ctx).Model(&entities.CartItem{}).
 			Where("cart_id = ? and food_id = ?", cartItem.CartId, cartItem.FoodId).
@@ -79,9 +76,7 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 			return ErrCreatingCartItem
 		}
 
-		fmt.Println("before mapper")
 		entity = mappers.DomainToCartItemEntity(cartItem)
-		fmt.Println("after mapper")
 
 		if err = tx.WithContext(ctx).Model(&entities.CartItem{}).Create(&entity).Error; err != nil {
 			return ErrCreatingCartItem

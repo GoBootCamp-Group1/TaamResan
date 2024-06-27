@@ -11,14 +11,15 @@ import (
 )
 
 type Order struct {
-	ID                 uint
-	RestaurantID       uint
-	UserID             uint
-	AddressID          uint
-	CreatedAt          time.Time
-	CustomerApprovedAt time.Time
-	Status             uint
-	Note               string
+	ID                 uint      `json:"id"`
+	RestaurantID       uint      `json:"restaurant_id"`
+	UserID             uint      `json:"user_id"`
+	AddressID          uint      `json:"address_id"`
+	CreatedAt          time.Time `json:"created_at"`
+	CustomerApprovedAt time.Time `json:"customer_approved_at"`
+	Status             uint      `json:"status"`
+	StatusTitle        string    `json:"status_title"`
+	Note               string    `json:"note"`
 
 	Restaurant *restaurant.Restaurant `json:"restaurant"`
 	Address    *address.Address       `json:"address"`
@@ -43,6 +44,33 @@ const (
 	STATUS_COURIER_TO_CUSTOMER
 	STATUS_DELIVERED
 )
+
+func (o *Order) MapStatusToStr() string {
+	switch o.Status {
+	case STATUS_DRAFT:
+		return "Draft"
+	case STATUS_UNPAID:
+		return "Unpaid"
+	case STATUS_PAID:
+		return "Paid"
+	case STATUS_CANCELLED_BY_CUSTOMER:
+		return "Cancelled by Customer"
+	case STATUS_CANCELLED_BY_RESTAURANT:
+		return "Cancelled by Restaurant"
+	case STATUS_WAITING_RESTAURANT_APPROVE:
+		return "Waiting for Restaurant Approval"
+	case STATUS_PREPARING:
+		return "Preparing"
+	case STATUS_COURIER_TO_RESTAURANT:
+		return "Courier to Restaurant"
+	case STATUS_COURIER_TO_CUSTOMER:
+		return "Courier to Customer"
+	case STATUS_DELIVERED:
+		return "Delivered"
+	default:
+		return "Unknown Status"
+	}
+}
 
 type Repo interface {
 	Create(ctx context.Context, data *InputData, cartModel *cart.Cart) (*Order, error)

@@ -20,4 +20,9 @@ func InitOrderRoutes(router *tcp_http_server.Router, app *service.AppContainer, 
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
+	router.HandleFunc("GET /orders/:orderId", tcp_http_server.HandlerChain(
+		order.InfoHandler(app),
+		middlewares.LoggingMiddleware(app.ActionLogService()),
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
 }
