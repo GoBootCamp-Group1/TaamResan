@@ -46,7 +46,6 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 			return err
 		}
 
-		fmt.Printf("---%+v", cartEntity)
 		if cartEntity.RestaurantId == nil {
 			cartEntity.RestaurantId = &restaurantId
 			if err = tx.WithContext(ctx).Model(&entities.Cart{}).Where("id = ?", cartEntity.ID).Save(&cartEntity).Error; err != nil {

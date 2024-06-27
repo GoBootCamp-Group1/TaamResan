@@ -1,13 +1,10 @@
-include .env
-export
-
-all: build test
+all: run-server linter-golangci clean
 
 run: run-server
 
 run-server:
-	cd cmd/server && go mod tidy && go mod download && \
-	CGO_ENABLED=0 go run Taamresan/cmd/server
+	cd cmd/api && go mod tidy && go mod download && \
+	CGO_ENABLED=0 go run main.go
 .PHONY: run-server
 
 #docker-compose: docker-compose-stop docker-compose-start

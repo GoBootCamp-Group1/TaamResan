@@ -79,4 +79,5 @@ type Repo interface {
 	GetItemsCancellationFee(ctx context.Context, order *Order) (float64, error)
 	GetItemsFee(ctx context.Context, order *Order) (float64, error)
 	GetOrderByID(ctx context.Context, id uint) (*Order, error)
+	ChangeStatusByRestaurant(ctx context.Context, order *Order) error
 }

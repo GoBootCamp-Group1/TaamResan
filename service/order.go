@@ -127,3 +127,7 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 
 	return updatedOrder, refundAmount, nil
 }
+
+func (s *OrderService) ChangeStatusByRestaurant(ctx context.Context, o *order.Order) error {
+	return s.orderOps.ChangeStatusByRestaurant(ctx, o)
+}
