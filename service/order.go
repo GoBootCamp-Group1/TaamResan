@@ -4,13 +4,11 @@ import (
 	"TaamResan/internal/cart"
 	"TaamResan/internal/food"
 	"TaamResan/internal/order"
-	"TaamResan/internal/restaurant_staff"
 	"TaamResan/internal/wallet"
 	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
 	"fmt"
-	"time"
 )
 
 type OrderService struct {
@@ -166,4 +164,8 @@ func (s *OrderService) ApproveByCustomer(ctx context.Context, o *order.Order) (*
 	}
 
 	return updatedOrder, nil
+}
+
+func (s *OrderService) ChangeStatusByRestaurant(ctx context.Context, o *order.Order) error {
+	return s.orderOps.ChangeStatusByRestaurant(ctx, o)
 }

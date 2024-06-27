@@ -35,3 +35,7 @@ func (o Ops) GetItemsFee(ctx context.Context, order *Order) (float64, error) {
 func (o Ops) GetOrderByID(ctx context.Context, id uint) (*Order, error) {
 	return o.repo.GetOrderByID(ctx, id)
 }
+
+func (o Ops) ChangeStatusByRestaurant(ctx context.Context, order *Order) error {
+	return o.repo.ChangeStatusByRestaurant(ctx, order)
+}

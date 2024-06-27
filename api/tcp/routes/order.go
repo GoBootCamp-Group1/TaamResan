@@ -21,12 +21,20 @@ func InitOrderRoutes(router *tcp_http_server.Router, app *service.AppContainer, 
 		order.CancelHandler(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ORDER, []uint{role.Customer}),
 	))
 
 	router.HandleFunc("GET /orders/:orderId", tcp_http_server.HandlerChain(
 		order.InfoHandler(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ORDER, []uint{role.Customer}),
+	))
+	router.HandleFunc("PUT /orders/:orderId/status", tcp_http_server.HandlerChain(
+		order.ChangeStatusHandler(app),
+		middlewares.LoggingMiddleware(app.ActionLogService()),
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ORDER_STATUS, []uint{role.RestaurantOperator, role.RestaurantOwner}),
 	))
 
 	router.HandleFunc("PUT /orders/:orderId/approve", tcp_http_server.HandlerChain(
