@@ -7,7 +7,6 @@ import (
 	"TaamResan/internal/cart_item"
 	"TaamResan/internal/order"
 	"context"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -72,10 +71,82 @@ func (o *orderRepo) Create(ctx context.Context, data *order.InputData, cart *car
 	return mappers.OrderEntityToDomain(orderEntity), nil
 }
 
-func (o *orderRepo) AddCartItemToOrder(ctx context.Context, order *order.Order, item *cart_item.CartItem) error {
+func (o *orderRepo) Update(ctx context.Context, order *order.Order) (*order.Order, error) {
 
-	fmt.Println("ORDER: ", order)
-	fmt.Println("ORDER ID: ", order.ID)
+	orderEntity := mappers.DomainToOrderEntity(order)
+
+	tErr := o.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.WithContext(ctx).Model(&entities.Order{}).
+			Where("id = ?", orderEntity.ID).Save(&orderEntity).Error
+		if err != nil {
+			return ErrUpdatingFood
+		}
+
+		return nil
+	})
+
+	if tErr != nil {
+		return nil, tErr
+	}
+
+	return mappers.OrderEntityToDomain(orderEntity), nil
+}
+
+func (o *orderRepo) GetItemsCancellationFee(ctx context.Context, order *order.Order) (float64, error) {
+
+	sql := `
+		SELECT SUM((f.cancel_rate::numeric / 100) * f.price * ot.amount) AS "total_cancellation_amount"
+		FROM orders o
+				 INNER JOIN order_items ot ON o.id = ot.order_id
+				 INNER JOIN foods f ON ot.food_id = f.id AND f.deleted_at IS NULL
+		WHERE o.id = ?
+		`
+	var amount float64
+	err := o.db.WithContext(ctx).Raw(sql, order.ID).Scan(&amount).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return amount, nil
+}
+
+func (o *orderRepo) GetItemsFee(ctx context.Context, order *order.Order) (float64, error) {
+
+	sql := `
+		SELECT SUM(f.price * ot.amount) AS "total_amount"
+		FROM orders o
+				 INNER JOIN order_items ot ON o.id = ot.order_id
+				 INNER JOIN foods f ON ot.food_id = f.id AND f.deleted_at IS NULL
+		WHERE o.id = ?
+		`
+	var amount float64
+	err := o.db.WithContext(ctx).Raw(sql, order.ID).Scan(&amount).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return amount, nil
+}
+
+func (o *orderRepo) GetOrderByID(ctx context.Context, id uint) (*order.Order, error) {
+
+	var orderEntity *entities.Order
+
+	err := o.db.WithContext(ctx).Model(&entities.Order{}).
+		Preload("Restaurant").
+		Preload("Address").
+		Where("id = ?", id).Find(&orderEntity).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return mappers.OrderEntityToDomain(orderEntity), nil
+}
+
+func (o *orderRepo) AddCartItemToOrder(ctx context.Context, order *order.Order, item *cart_item.CartItem) error {
 
 	orderItemEntity := &entities.OrderItem{
 		OrderId: order.ID,

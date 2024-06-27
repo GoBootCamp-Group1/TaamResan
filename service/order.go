@@ -79,3 +79,37 @@ func (s *OrderService) Create(ctx context.Context, data *order.InputData) (*orde
 
 	return newOrder, nil
 }
+
+func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*order.Order, float64, error) {
+	//TODO:start transaction
+	//check if order is already cancelled
+	orderInfo, err := s.orderOps.GetOrderByID(ctx, o.ID)
+	if orderInfo.Status == order.STATUS_CANCELLED_BY_CUSTOMER {
+		return nil, 0, fmt.Errorf("order is already cancelled by customer")
+	}
+	//update status of order
+	orderInfo.Status = order.STATUS_CANCELLED_BY_CUSTOMER
+	updatedOrder, err := s.orderOps.Update(ctx, orderInfo)
+	if err != nil {
+		return nil, 0, fmt.Errorf("can not update order: %w", err)
+	}
+	//calculate food cancellation price
+	cancellationAmount, err := s.orderOps.GetItemsCancellationFee(ctx, o)
+	if err != nil {
+		return nil, 0, fmt.Errorf("can not get order cancellation amount: %w", err)
+	}
+	totalAmount, err := s.orderOps.GetItemsFee(ctx, o)
+	if err != nil {
+		return nil, 0, fmt.Errorf("can not get order items fee: %w", err)
+	}
+	//add to wallet
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	userWallet, err := s.walletOps.GetWalletByUserId(ctx, userID)
+	refundAmount := totalAmount - cancellationAmount
+	err = s.walletOps.Refund(ctx, userWallet, refundAmount)
+	if err != nil {
+		return nil, 0, fmt.Errorf("can not refund user wallet: %w", err)
+	}
+	//TODO:commit transaction
+	return updatedOrder, refundAmount, nil
+}

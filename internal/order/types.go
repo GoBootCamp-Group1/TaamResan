@@ -47,4 +47,8 @@ const (
 type Repo interface {
 	Create(ctx context.Context, data *InputData, cartModel *cart.Cart) (*Order, error)
 	AddCartItemToOrder(ctx context.Context, order *Order, item *cart_item.CartItem) error
+	Update(ctx context.Context, order *Order) (*Order, error)
+	GetItemsCancellationFee(ctx context.Context, order *Order) (float64, error)
+	GetItemsFee(ctx context.Context, order *Order) (float64, error)
+	GetOrderByID(ctx context.Context, id uint) (*Order, error)
 }

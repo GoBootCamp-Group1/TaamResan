@@ -34,6 +34,10 @@ func (o *Ops) TopUp(ctx context.Context, w *WalletTopUp) error {
 	return o.repo.TopUp(ctx, w)
 }
 
+func (o *Ops) Refund(ctx context.Context, w *Wallet, amount float64) error {
+	return o.repo.Refund(ctx, w, amount)
+}
+
 func (o *Ops) Expense(ctx context.Context, wallet *Wallet, amount float64) error {
 	return o.repo.Expense(ctx, wallet, amount)
 }
