@@ -7,6 +7,7 @@ import (
 
 func ActionLogEntityToDomain(entity *entities.ActionLog) *action_log.ActionLog {
 	return &action_log.ActionLog{
+		ID:         entity.ID,
 		UserID:     entity.UserID,
 		Action:     entity.Action,
 		IP:         entity.IP,

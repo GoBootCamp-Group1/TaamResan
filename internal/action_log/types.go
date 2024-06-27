@@ -21,6 +21,7 @@ type ActionLog struct {
 
 type Repo interface {
 	Create(ctx context.Context, actionLog *ActionLog) (*ActionLog, error)
+	Update(ctx context.Context, actionLog *ActionLog) error
 	GetAllByUserId(ctx context.Context, userId uint) ([]*ActionLog, error)
 	GetAllByRestaurantId(ctx context.Context, restaurantId uint) ([]*ActionLog, error)
 }

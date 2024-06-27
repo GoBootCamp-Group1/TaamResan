@@ -35,6 +35,17 @@ func (w *actionLogRepo) Create(ctx context.Context, actionLog *action_log.Action
 	return mappers.ActionLogEntityToDomain(actionLogEntity), nil
 }
 
+func (w *actionLogRepo) Update(ctx context.Context, actionLog *action_log.ActionLog) error {
+
+	actionLogEntity := mappers.DomainToActionLogEntity(actionLog)
+
+	if err := w.db.WithContext(ctx).Model(&entities.ActionLog{}).Where("id = ?", actionLog.ID).Save(&actionLogEntity).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (w *actionLogRepo) GetAllByUserId(ctx context.Context, userId uint) ([]*action_log.ActionLog, error) {
 	var logs []*entities.ActionLog
 	if err := w.db.WithContext(ctx).Model(&entities.ActionLog{}).Where("user_id = ?", userId).Find(&logs).Error; err != nil {

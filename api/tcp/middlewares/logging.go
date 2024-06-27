@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	log2 "log"
+	"log"
 	"net"
 	"os"
 	"strings"
@@ -36,7 +36,7 @@ func LoggingMiddleware(actionLogService *service.ActionLogService) tcp.Middlewar
 				Method:   request.Method,
 			}
 
-			log, errLog := actionLogService.Create(request.Context(), &actionLog)
+			l, errLog := actionLogService.Create(request.Context(), &actionLog)
 			if errLog != nil {
 				fmt.Printf(errLog.Error() + "\n")
 			}
@@ -44,7 +44,7 @@ func LoggingMiddleware(actionLogService *service.ActionLogService) tcp.Middlewar
 			writeLogToFile(request)
 
 			//set log to context
-			ctx := context.WithValue(request.Context(), action_log.LogCtxKey, log)
+			ctx := context.WithValue(request.Context(), action_log.LogCtxKey, l)
 			request = request.WithContext(ctx)
 
 			next(conn, request)
@@ -88,7 +88,7 @@ func writeLogToFile(request *tcp.Request) {
 
 	multiWriter := io.MultiWriter(os.Stdout, logFile)
 
-	logger := log2.New(multiWriter, "Logger: ", log2.LstdFlags)
+	logger := log.New(multiWriter, "Logger: ", log.LstdFlags)
 
 	logger.Printf("Received %s request for %s", request.Method, request.Uri)
 

@@ -34,7 +34,7 @@ func Run(cfg config.Server, app *service.AppContainer) {
 	// Define listener
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", cfg.Host, cfg.HttpPort))
 	if err != nil {
-		fmt.Println("Error starting TCP server:", err)
+		fmt.Printf("Error starting TCP server: %+v", err)
 		return
 	}
 	defer listener.Close()
@@ -45,16 +45,13 @@ func Run(cfg config.Server, app *service.AppContainer) {
 	// register global routes
 	registerGlobalRoutes(router, app, cfg)
 
-	// registering users APIs
-	//registerUsersAPI(api, app.UserService(), []byte(cfg.TokenSecret))
-
 	fmt.Printf("🌏 Listening on %s:%d\n", cfg.Host, cfg.HttpPort)
 
 	// run server
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Error accepting connection:", err)
+			fmt.Printf("Error accepting connection: %+v", err)
 			continue
 		}
 		go router.Serve(conn)

@@ -16,6 +16,10 @@ func (o *Ops) Create(ctx context.Context, actionLog *ActionLog) (*ActionLog, err
 	return o.repo.Create(ctx, actionLog)
 }
 
+func (o *Ops) Update(ctx context.Context, log *ActionLog) error {
+	return o.repo.Update(ctx, log)
+}
+
 func (o *Ops) GetAllByUserId(ctx context.Context, userId uint) ([]*ActionLog, error) {
 	return o.repo.GetAllByUserId(ctx, userId)
 }

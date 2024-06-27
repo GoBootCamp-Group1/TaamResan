@@ -1,14 +1,11 @@
 package restaurant_handlers
 
 import (
-	"TaamResan/internal/action_log"
 	"TaamResan/internal/address"
 	"TaamResan/internal/restaurant"
 	tcp "TaamResan/pkg/tcp_http_server"
 	"TaamResan/pkg/validator"
 	"TaamResan/service"
-	"encoding/json"
-	"fmt"
 	"net"
 	"strconv"
 )
@@ -64,11 +61,6 @@ func UpdateRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		if err = logUpdateRestaurantRequest(app, request, uint(id)); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-			return
-		}
-
 		responseBody := map[string]any{
 			"message": "restaurant updated successfully",
 		}
@@ -96,26 +88,4 @@ func validateUpdateInputs(conn net.Conn, reqParams UpdateRequestBody) {
 		tcp.RespondJsonValidateError(conn, errors, tcp.INVALID_INPUT)
 		return
 	}
-}
-
-func logUpdateRestaurantRequest(app *service.AppContainer, request *tcp.Request, restaurantId uint) error {
-	userId := request.GetUserID()
-	var payload map[string]any
-	err := json.Unmarshal([]byte(request.Body), &payload)
-	if err != nil && request.Body != "" {
-		fmt.Printf(err.Error() + "\n")
-	}
-	log := action_log.ActionLog{
-		UserID:     &userId,
-		Action:     "Update Restaurant",
-		IP:         request.IP,
-		Endpoint:   request.Uri,
-		Payload:    payload,
-		Method:     request.Method,
-		EntityType: action_log.RestaurantEntityType,
-		EntityID:   restaurantId,
-	}
-	_, err = app.ActionLogService().Create(request.Context(), &log)
-
-	return err
 }

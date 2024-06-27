@@ -186,7 +186,10 @@ func (a *AppContainer) setRestaurantService() {
 	if a.restaurantService != nil {
 		return
 	}
-	a.restaurantService = NewRestaurantService(restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)))
+	a.restaurantService = NewRestaurantService(
+		restaurant.NewOps(storage2.NewRestaurantRepo(a.dbConn)),
+		action_log.NewOps(storage2.NewActionLogRepo(a.dbConn)),
+	)
 }
 
 func (a *AppContainer) setRestaurantStaffService() {
