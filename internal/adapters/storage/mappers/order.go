@@ -31,5 +31,7 @@ func DomainToOrderEntity(model *order.Order) *entities.Order {
 		CustomerApprovedAt: model.CustomerApprovedAt,
 		Status:             model.Status,
 		Note:               model.Note,
+		Restaurant:         DomainToRestaurantEntity(model.Restaurant),
+		Address:            DomainToAddressEntity(model.Address),
 	}
 }

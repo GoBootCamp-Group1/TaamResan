@@ -14,4 +14,10 @@ func InitOrderRoutes(router *tcp_http_server.Router, app *service.AppContainer, 
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
 	))
+
+	router.HandleFunc("PUT /orders/:orderId/cancel", tcp_http_server.HandlerChain(
+		order.CancelHandler(app),
+		middlewares.LoggingMiddleware(app.ActionLogService()),
+		middlewares.AuthMiddleware(cfg.TokenSecret),
+	))
 }

@@ -189,6 +189,32 @@ func (w *walletRepo) Expense(ctx context.Context, targetWallet *wallet.Wallet, a
 	})
 }
 
+func (w *walletRepo) Refund(ctx context.Context, targetWallet *wallet.Wallet, amount float64) error {
+	walletEntity := mappers.DomainToWalletEntity(targetWallet)
+
+	return w.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+
+		//add to from wallet
+		walletEntity.Credit += amount
+		if err := tx.Save(&walletEntity).Error; err != nil {
+			return err
+		}
+
+		//store transaction
+		transaction := entities.WalletTransaction{
+			WalletID: walletEntity.ID,
+			Type:     wallet.TRANSACTION_TYPE_REFUND,
+			Status:   wallet.TRANSACTION_STATUS_DONE,
+			Amount:   amount,
+		}
+		if err := tx.Save(&transaction).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (w *walletRepo) GetUserActiveWallet(ctx context.Context, userId uint) (entities.Wallet, error) {
 	var walletEntity entities.Wallet
 	if err := w.db.WithContext(ctx).Model(&entities.Wallet{}).Where("user_id = ?", userId).Find(&walletEntity).Error; err != nil {

@@ -44,6 +44,7 @@ const (
 	TRANSACTION_TYPE_EXPENSE
 	TRANSACTION_TYPE_WITHDRAW
 	TRANSACTION_TYPE_UNKNOWN
+	TRANSACTION_TYPE_REFUND
 )
 
 const (
@@ -65,4 +66,5 @@ type Repo interface {
 	DeleteWalletCard(ctx context.Context, card *WalletCard) error
 	Withdraw(ctx context.Context, w *WalletWithdraw) error
 	GetWalletByUserId(ctx context.Context, userId uint) (*Wallet, error)
+	Refund(ctx context.Context, w *Wallet, amount float64) error
 }
