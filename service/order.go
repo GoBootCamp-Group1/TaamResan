@@ -4,26 +4,30 @@ import (
 	"TaamResan/internal/cart"
 	"TaamResan/internal/food"
 	"TaamResan/internal/order"
+	"TaamResan/internal/restaurant_staff"
 	"TaamResan/internal/wallet"
 	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type OrderService struct {
-	orderOps  *order.Ops
-	cartOps   *cart.Ops
-	foodOps   *food.Ops
-	walletOps *wallet.Ops
+	orderOps           *order.Ops
+	cartOps            *cart.Ops
+	foodOps            *food.Ops
+	walletOps          *wallet.Ops
+	restaurantStaffOps *restaurant_staff.Ops
 }
 
-func NewOrderService(orderOps *order.Ops, cartOps *cart.Ops, foodOps *food.Ops, walletOps *wallet.Ops) *OrderService {
+func NewOrderService(orderOps *order.Ops, cartOps *cart.Ops, foodOps *food.Ops, walletOps *wallet.Ops, restaurantStaffOps *restaurant_staff.Ops) *OrderService {
 	return &OrderService{
-		orderOps:  orderOps,
-		cartOps:   cartOps,
-		foodOps:   foodOps,
-		walletOps: walletOps,
+		orderOps:           orderOps,
+		cartOps:            cartOps,
+		foodOps:            foodOps,
+		walletOps:          walletOps,
+		restaurantStaffOps: restaurantStaffOps,
 	}
 }
 
@@ -83,6 +87,12 @@ func (s *OrderService) GetOrderInfo(ctx context.Context, o *order.Order) (*order
 		return nil, fmt.Errorf("can not fetch order: %w", err)
 	}
 
+	//check if order owner is logged-in user?
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	if fetchedOrder.UserID != userID {
+		return nil, fmt.Errorf("order is not belong to you")
+	}
+
 	//TODO: better to use a mutator
 	fetchedOrder.StatusTitle = fetchedOrder.MapStatusToStr()
 
@@ -96,6 +106,12 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 	orderInfo, err := s.orderOps.GetOrderByID(ctx, o.ID)
 	if orderInfo.Status == order.STATUS_CANCELLED_BY_CUSTOMER {
 		return nil, 0, fmt.Errorf("order is already cancelled by customer")
+	}
+
+	//check if order owner is logged-in user?
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	if orderInfo.UserID != userID {
+		return nil, 0, fmt.Errorf("order is not belong to you")
 	}
 
 	//update status of order
@@ -116,7 +132,6 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 	}
 
 	//add to wallet
-	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	userWallet, err := s.walletOps.GetWalletByUserId(ctx, userID)
 	refundAmount := totalAmount - cancellationAmount
 	err = s.walletOps.Refund(ctx, userWallet, refundAmount)
@@ -126,6 +141,48 @@ func (s *OrderService) CancelByCustomer(ctx context.Context, o *order.Order) (*o
 	//TODO:commit transaction
 
 	return updatedOrder, refundAmount, nil
+}
+
+func (s *OrderService) ApproveByCustomer(ctx context.Context, o *order.Order) (*order.Order, error) {
+	//check if order is already approved
+	orderInfo, err := s.orderOps.GetOrderByID(ctx, o.ID)
+	if !orderInfo.CustomerApprovedAt.IsZero() {
+		return nil, fmt.Errorf("order is already approved by customer")
+	}
+
+	//check if order owner is logged-in user?
+	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
+	if orderInfo.UserID != userID {
+		return nil, fmt.Errorf("order is not belong to you")
+	}
+
+	//update order
+	orderInfo.Status = order.STATUS_DELIVERED
+	orderInfo.CustomerApprovedAt = time.Now()
+	updatedOrder, err := s.orderOps.Update(ctx, orderInfo)
+	if err != nil {
+		return nil, fmt.Errorf("can not update order: %w", err)
+	}
+
+	//increase credits of restaurant owner
+	restaurantOwner, err := s.restaurantStaffOps.GetOwnerByRestaurantId(ctx, updatedOrder.RestaurantID)
+	if err != nil {
+		return nil, fmt.Errorf("can not fetch owner: %w", err)
+	}
+	ownerWallet, err := s.walletOps.GetWalletByUserId(ctx, restaurantOwner.UserId)
+	if err != nil {
+		return nil, fmt.Errorf("can not fetch owner wallet: %w", err)
+	}
+	orderTotalFee, err := s.orderOps.GetItemsFee(ctx, updatedOrder)
+	if err != nil {
+		return nil, fmt.Errorf("can not fetch order total fee: %w", err)
+	}
+	err = s.walletOps.Income(ctx, ownerWallet, orderTotalFee)
+	if err != nil {
+		return nil, fmt.Errorf("can not add income credit to restaurant owner wallet: %w", err)
+	}
+
+	return updatedOrder, nil
 }
 
 func (s *OrderService) ChangeStatusByRestaurant(ctx context.Context, o *order.Order) error {

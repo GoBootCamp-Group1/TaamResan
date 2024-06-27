@@ -22,6 +22,10 @@ func (o *Ops) GetAllByRestaurantId(ctx context.Context, restaurantId uint) ([]*R
 	return o.repo.GetAllByRestaurantId(ctx, restaurantId)
 }
 
+func (o *Ops) GetOwnerByRestaurantId(ctx context.Context, restaurantId uint) (*RestaurantStaff, error) {
+	return o.repo.GetOwnerByRestaurantId(ctx, restaurantId)
+}
+
 func (o *Ops) GetById(ctx context.Context, id uint) (*RestaurantStaff, error) {
 	return o.repo.GetById(ctx, id)
 }
