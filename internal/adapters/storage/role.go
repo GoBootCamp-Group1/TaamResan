@@ -31,23 +31,22 @@ var (
 
 func (r *roleRepo) Create(ctx context.Context, role *role.Role) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		var existingRole1 entities.Role
-		var existingRole2 entities.Role
-		err1 := tx.WithContext(ctx).Model(&entities.Role{}).Where("id = ?", role.ID).First(&existingRole1).Error
-		err2 := tx.WithContext(ctx).Model(&entities.Role{}).Where("name = ?", role.Name).First(&existingRole2).Error
+		var existingRole entities.Role
+		err1 := tx.WithContext(ctx).Model(&entities.Role{}).Where("id = ?", role.ID).First(&existingRole).Error
 
-		if err1 != nil && err2 != nil {
-			if errors.Is(err1, gorm.ErrRecordNotFound) && errors.Is(err2, gorm.ErrRecordNotFound) {
-				entity := mappers.DomainToRoleEntity(role)
-				if err := tx.WithContext(ctx).Create(&entity).Error; err != nil {
-					return ErrCreatingRole
-				}
-				return nil
-			}
+		if err1 != nil && !errors.Is(err1, gorm.ErrRecordNotFound) {
 			return ErrCreatingRole
 		}
 
-		return ErrRoleExists
+		if errors.Is(err1, gorm.ErrRecordNotFound) || existingRole.ID == 0 {
+			entity := mappers.DomainToRoleEntity(role)
+			if err := tx.WithContext(ctx).Create(&entity).Error; err != nil {
+				return ErrCreatingRole
+			}
+			return nil
+		}
+
+		return nil
 	})
 }
 

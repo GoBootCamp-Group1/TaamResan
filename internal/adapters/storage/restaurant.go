@@ -6,10 +6,10 @@ import (
 	"TaamResan/internal/address"
 	"TaamResan/internal/restaurant"
 	"TaamResan/internal/restaurant_staff"
+	"TaamResan/internal/role"
 	"TaamResan/pkg/jwt"
 	"context"
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 	"math"
 )
@@ -67,7 +67,6 @@ func (r *restaurantRepo) Create(ctx context.Context, restaurant *restaurant.Rest
 			Where("name = ? and address_id = ? and owned_by = ?", restaurant.Name, addrEntity.ID, restaurant.OwnedBy).
 			Find(&existingRestaurant).Error
 		if existingRestaurant.ID != 0 {
-			fmt.Printf("--------- %+v", existingRestaurant)
 			return ErrRestaurantExists
 		}
 
@@ -101,6 +100,15 @@ func (r *restaurantRepo) Create(ctx context.Context, restaurant *restaurant.Rest
 		err = tx.WithContext(ctx).Model(&entities.RestaurantStaff{}).Create(&entity).Error
 		if err != nil {
 			return ErrCreatingRestaurantStaff
+		}
+
+		// add to roles
+		ownerRole := entities.UserRoles{
+			UserId: restaurant.OwnedBy,
+			RoleId: role.RestaurantOwner,
+		}
+		if err = tx.WithContext(ctx).Model(&entities.UserRoles{}).Save(&ownerRole).Error; err != nil {
+			return ErrCreatingRestaurant
 		}
 
 		return nil
@@ -210,8 +218,9 @@ func (r *restaurantRepo) GetById(ctx context.Context, id uint) (*restaurant.Rest
 }
 
 func (r *restaurantRepo) GetAll(ctx context.Context) ([]*restaurant.Restaurant, error) {
+	userId := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	var restaurantsEntities []*entities.Restaurant
-	err := r.db.WithContext(ctx).Model(&entities.Restaurant{}).Find(&restaurantsEntities).Error
+	err := r.db.WithContext(ctx).Model(&entities.Restaurant{}).Where("owned_by = ?", userId).Find(&restaurantsEntities).Error
 	if err != nil {
 		return nil, ErrFetchingRestaurants
 	}
@@ -303,7 +312,7 @@ func (r *restaurantRepo) DelegateOwnership(ctx context.Context, id uint, newOwne
 
 func (r *restaurantRepo) SearchRestaurants(ctx context.Context, searchData *restaurant.RestaurantSearch) ([]*restaurant.Restaurant, error) {
 	var restaurantsEntities []*entities.Restaurant
-	query := r.db.Debug().Table("restaurants").Select("restaurants.*").
+	query := r.db.Table("restaurants").Select("restaurants.*").
 		Joins("JOIN categories ON categories.restaurant_id = restaurants.id").
 		Where("restaurants.name LIKE ?", "%"+searchData.Name+"%")
 
@@ -313,7 +322,7 @@ func (r *restaurantRepo) SearchRestaurants(ctx context.Context, searchData *rest
 
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	blockedRestaurantSubQuery := r.db.Model(&entities.BlockRestaurant{}).
-		Select("block_restaurants.id").
+		Select("block_restaurants.restaurant_id").
 		Where("block_restaurants.user_id = ?", userID)
 
 	query = query.Not("restaurants.id IN (?)", blockedRestaurantSubQuery)

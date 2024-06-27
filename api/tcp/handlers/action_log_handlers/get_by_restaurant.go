@@ -16,16 +16,9 @@ func GetByRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		userId := request.GetUserID() // TODO: check permission
-
 		logs, err := app.ActionLogService().GetAllByRestaurantId(request.Context(), uint(restaurantId))
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-			return
-		}
-
-		if err = app.AccessService().CheckAdminAccess(request.Context(), userId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
 			return
 		}
 

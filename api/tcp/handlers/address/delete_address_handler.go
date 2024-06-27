@@ -18,8 +18,6 @@ func DeleteAddress(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//TODO: check for permission and ownership of resource
-
 		deletedAddress := address.Address{
 			ID: uint(addressId),
 		}

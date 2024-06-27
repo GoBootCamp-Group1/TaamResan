@@ -33,8 +33,6 @@ func Update(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateUpdateInputs(conn, reqParams)
 
-		//userId := request.GetUserID() // TODO: permission and User
-
 		cartItem := cart_item.CartItem{
 			ID:     uint(id),
 			Amount: reqParams.Amount,

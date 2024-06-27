@@ -4,6 +4,7 @@ import (
 	"TaamResan/api/tcp/handlers/order"
 	"TaamResan/api/tcp/middlewares"
 	"TaamResan/cmd/api/config"
+	"TaamResan/internal/role"
 	"TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
 )
@@ -13,5 +14,6 @@ func InitOrderRoutes(router *tcp_http_server.Router, app *service.AppContainer, 
 		order.StoreHandler(app),
 		middlewares.LoggingMiddleware(app.ActionLogService()),
 		middlewares.AuthMiddleware(cfg.TokenSecret),
+		middlewares.PermissionCheck(app, role.ORDER, []uint{role.Customer}),
 	))
 }

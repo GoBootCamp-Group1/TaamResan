@@ -23,7 +23,7 @@ func Create(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateCreateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: Check permission and Owner
+		userId := request.GetUserID()
 
 		newBlockRestaurant := block_restaurant.BlockRestaurant{
 			UserId:       userId,

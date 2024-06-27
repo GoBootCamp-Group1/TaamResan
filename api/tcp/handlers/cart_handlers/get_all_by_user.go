@@ -8,7 +8,7 @@ import (
 
 func GetAllByUser(app *service.AppContainer) tcp.HandlerFunc {
 	return func(conn net.Conn, request *tcp.Request) {
-		userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
+		userId := request.GetUserID()
 
 		cartModels, err := app.CartService().GetByUserId(request.Context(), userId)
 		if err != nil {

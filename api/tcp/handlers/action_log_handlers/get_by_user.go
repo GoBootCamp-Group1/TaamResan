@@ -16,16 +16,9 @@ func GetByUser(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		userId := request.GetUserID() // TODO: check permission
-
 		logs, err := app.ActionLogService().GetAllByUserId(request.Context(), uint(targetUserId))
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-			return
-		}
-
-		if err = app.AccessService().CheckAdminAccess(request.Context(), userId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
 			return
 		}
 

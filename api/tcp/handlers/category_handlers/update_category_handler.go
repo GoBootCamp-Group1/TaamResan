@@ -33,17 +33,7 @@ func Update(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateUpdateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		cat, err := app.CategoryService().GetById(request.Context(), uint(id))
-		if err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)
-			return
-		}
-		restaurantId := cat.RestaurantId
-		if err = app.AccessService().CheckRestaurantStaff(request.Context(), userId, restaurantId); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
+		userId := request.GetUserID()
 
 		newCategory := category.Category{
 			ID:        uint(id),

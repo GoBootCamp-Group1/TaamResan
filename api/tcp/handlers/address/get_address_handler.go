@@ -26,8 +26,6 @@ func GetAddress(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//TODO: check for permission and ownership of resource
-
 		fetchedAddress, err := app.AddressService().GetAddressByID(request.Context(), uint(addressId))
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)

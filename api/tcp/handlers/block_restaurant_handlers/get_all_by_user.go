@@ -16,8 +16,6 @@ func GetAllByRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
-
 		blockRestaurants, err := app.BlockRestaurantService().GetAllByUserId(request.Context(), uint(userId))
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)

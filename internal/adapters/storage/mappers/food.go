@@ -4,6 +4,7 @@ import (
 	"TaamResan/internal/adapters/storage/entities"
 	"TaamResan/internal/category"
 	"TaamResan/internal/food"
+	"TaamResan/internal/restaurant"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +15,11 @@ func FoodEntityToDomain(entity *entities.Food) *food.Food {
 		categories = append(categories, CategoryEntityToDomain(c))
 	}
 
+	var res *restaurant.Restaurant
+	if entity.Restaurant != nil {
+		res = RestaurantEntityToDomain(entity.Restaurant)
+	}
+
 	return &food.Food{
 		ID:                 entity.ID,
 		RestaurantId:       entity.RestaurantId,
@@ -22,7 +28,7 @@ func FoodEntityToDomain(entity *entities.Food) *food.Food {
 		Price:              entity.Price,
 		CancelRate:         entity.CancelRate,
 		PreparationMinutes: entity.PreparationMinutes,
-		Restaurant:         RestaurantEntityToDomain(entity.Restaurant),
+		Restaurant:         res,
 		Categories:         categories,
 	}
 }

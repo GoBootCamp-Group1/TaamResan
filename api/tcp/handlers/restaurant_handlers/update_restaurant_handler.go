@@ -37,11 +37,7 @@ func UpdateRestaurant(app *service.AppContainer) tcp.HandlerFunc {
 
 		validateUpdateInputs(conn, reqParams)
 
-		userId := request.GetUserID() // TODO: check permission
-		if err = app.AccessService().CheckRestaurantOwner(request.Context(), userId, uint(id)); err != nil {
-			tcp.RespondJsonError(conn, err.Error(), tcp.FORBIDDEN)
-			return
-		}
+		userId := request.GetUserID()
 
 		newRestaurant := restaurant.Restaurant{
 			ID:      uint(id),

@@ -39,21 +39,29 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 
 		//check if we have cart for this restaurant
 		var cartEntity *entities.Cart
-		if err = tx.WithContext(ctx).Model(&entities.Cart{}).Debug().
+		if err = tx.WithContext(ctx).Model(&entities.Cart{}).
 			Preload("Items").
 			Where("user_id = ?", userID).
-			Where("restaurant_id = ?", restaurantId).
+			//Where("restaurant_id = ?", restaurantId).
 			Find(&cartEntity).Error; err != nil {
 			return err
 		}
 
+		fmt.Printf("---%+v", cartEntity)
+		if cartEntity.RestaurantId == nil {
+			cartEntity.RestaurantId = &restaurantId
+			if err = tx.WithContext(ctx).Model(&entities.Cart{}).Where("id = ?", cartEntity.ID).Save(&cartEntity).Error; err != nil {
+				return err
+			}
+		}
+
 		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
+			if errors.Is(err, gorm.ErrRecordNotFound) || cartEntity.ID == 0 {
 				// If the error is not record not found
 				//there is no cart for this restaurant, create one
 				cartEntity = &entities.Cart{
 					UserId:       userID,
-					RestaurantId: restaurantId,
+					RestaurantId: &restaurantId,
 				}
 				if err = tx.WithContext(ctx).Model(&entities.Cart{}).Create(&cartEntity).Error; err != nil {
 					return err
@@ -66,8 +74,6 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 		//store cart item
 		cartItem.CartId = cartEntity.ID
 
-		fmt.Println("cartItem", cartItem)
-
 		var entity *entities.CartItem
 		if err = tx.WithContext(ctx).Model(&entities.CartItem{}).
 			Where("cart_id = ? and food_id = ?", cartItem.CartId, cartItem.FoodId).
@@ -79,9 +85,7 @@ func (r *cartItemRepo) Create(ctx context.Context, cartItem *cart_item.CartItem)
 			return ErrCreatingCartItem
 		}
 
-		fmt.Println("before mapper")
 		entity = mappers.DomainToCartItemEntity(cartItem)
-		fmt.Println("after mapper")
 
 		if err = tx.WithContext(ctx).Model(&entities.CartItem{}).Create(&entity).Error; err != nil {
 			return ErrCreatingCartItem

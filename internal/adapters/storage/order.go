@@ -20,7 +20,7 @@ func NewOrderRepo(db *gorm.DB) order.Repo { return &orderRepo{db: db} }
 func (o *orderRepo) Create(ctx context.Context, data *order.InputData, cart *cart.Cart) (*order.Order, error) {
 
 	orderEntity := &entities.Order{
-		RestaurantID: cart.RestaurantId,
+		RestaurantID: *cart.RestaurantId,
 		UserID:       cart.UserId,
 		AddressID:    data.AddressID,
 		Status:       order.STATUS_PAID,

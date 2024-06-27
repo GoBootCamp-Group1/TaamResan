@@ -16,8 +16,6 @@ func GetAllByCart(app *service.AppContainer) tcp.HandlerFunc {
 			return
 		}
 
-		//userId := request.GetUserID() // TODO: check that user has permission and is OWNER to do this
-
 		cartItemModels, err := app.CartItemService().GetAllByCartId(request.Context(), uint(cartId))
 		if err != nil {
 			tcp.RespondJsonError(conn, err.Error(), tcp.INTERNAL_SERVER_ERROR)

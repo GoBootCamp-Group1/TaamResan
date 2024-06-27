@@ -155,7 +155,7 @@ func (r *foodRepo) GetAll(ctx context.Context, restaurantId uint) ([]*food.Food,
 func (r *foodRepo) SearchFoods(ctx context.Context, searchData *food.FoodSearch) ([]*food.Food, error) {
 
 	var foods []*entities.Food
-	query := r.db.Debug().WithContext(ctx).Model(&entities.Food{}).
+	query := r.db.WithContext(ctx).Model(&entities.Food{}).
 		Preload("Categories").
 		Preload("Restaurant").
 		Joins("JOIN category_foods ON category_foods.food_id = foods.id").
@@ -171,7 +171,7 @@ func (r *foodRepo) SearchFoods(ctx context.Context, searchData *food.FoodSearch)
 
 	userID := ctx.Value(jwt.UserClaimKey).(*jwt.UserClaims).UserID
 	blockedRestaurantSubQuery := r.db.Model(&entities.BlockRestaurant{}).
-		Select("block_restaurants.id").
+		Select("block_restaurants.restaurant_id").
 		Where("block_restaurants.user_id = ?", userID)
 
 	query = query.Not("foods.restaurant_id IN (?)", blockedRestaurantSubQuery)

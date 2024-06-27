@@ -14,7 +14,7 @@ type Repo interface {
 type Cart struct {
 	ID           uint
 	UserId       uint
-	RestaurantId uint
+	RestaurantId *uint
 	Items        []*cart_item.CartItem
 }
 

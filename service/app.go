@@ -2,7 +2,6 @@ package service
 
 import (
 	"TaamResan/cmd/api/config"
-	"TaamResan/internal/access"
 	"TaamResan/internal/action_log"
 	storage2 "TaamResan/internal/adapters/storage"
 	"TaamResan/internal/address"
@@ -40,7 +39,6 @@ type AppContainer struct {
 	blockRestaurantService *BlockRestaurantService
 	cartService            *CartService
 	cartItemService        *CartItemService
-	accessService          *AccessService
 	searchService          *SearchService
 	orderService           *OrderService
 }
@@ -67,7 +65,6 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setBlockRestaurantService()
 	app.setCartService()
 	app.setCartItemService()
-	app.setAccessService()
 	app.setSearchService()
 	app.setOrderService()
 
@@ -124,10 +121,6 @@ func (a *AppContainer) CartItemService() *CartItemService {
 
 func (a *AppContainer) SearchService() *SearchService {
 	return a.searchService
-}
-
-func (a *AppContainer) AccessService() *AccessService {
-	return a.accessService
 }
 
 func (a *AppContainer) setUserService() {
@@ -251,13 +244,6 @@ func (a *AppContainer) setCartItemService() {
 		return
 	}
 	a.cartItemService = NewCartItemService(cart_item.NewOps(storage2.NewCartItemRepo(a.dbConn)))
-}
-
-func (a *AppContainer) setAccessService() {
-	if a.accessService != nil {
-		return
-	}
-	a.accessService = NewAccessService(access.NewOps(storage2.NewAccessRepo(a.dbConn)))
 }
 
 func (a *AppContainer) setSearchService() {
