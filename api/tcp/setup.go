@@ -7,7 +7,7 @@ import (
 	"TaamResan/api/tcp/middlewares"
 	"TaamResan/api/tcp/routes"
 	"TaamResan/cmd/api/config"
-	"TaamResan/internal/adapters/storage"
+	"TaamResan/pkg/adapters/storage"
 	"TaamResan/pkg/tcp_http_server"
 	"TaamResan/service"
 	"context"
